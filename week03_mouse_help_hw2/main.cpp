@@ -1,5 +1,7 @@
+///week03_mouse_help_hw2
 #include <GL/glut.h>
-float mouseX=0, mouseY=0; ///*
+#include <stdio.h> ///printf()印東西用的 *
+float mouseX=0, mouseY=0;
 void myTeapot(float x, float y)
 {
     glPushMatrix();///備份矩陣(備份舊的位置)
@@ -7,18 +9,20 @@ void myTeapot(float x, float y)
         //glTranslatef(0.5,0.5,0); ///右上角 改成下面的
         glTranslatef(x,y,0);
         glColor3f(1,1,0); ///黃色
-        glutSolidTeapot(0.3); ///茶壺
+        glutSolidTeapot(0.1); ///茶壺 *
     glPopMatrix();///還原矩陣(還原舊的位置)
 }
 void display()
 {
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    myTeapot( (mouseX-150)/150.0, -(mouseY-150)/150.0 ); ///*
+    myTeapot( (mouseX-150)/150.0, -(mouseY-150)/150.0 ); ///
     glutSwapBuffers();
 }
 void mouse( int button, int state, int x, int y)
 {
-    mouseX=x; mouseY=y; ///*
+    printf("  glVertex2f( (%d-150)/150.0, -(%d-150)/150.0  ); \n" , x, y );
+    //printf("%d %d %d %d\n", button, state, x, y); ///
+    mouseX=x; mouseY=y;
 }
 int main(int argc, char** argv)
 {
