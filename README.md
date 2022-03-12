@@ -34,7 +34,8 @@
 ## step02 親手打造 GLUT 的程式
 ```C++
 1.建立 GLUT 檔案取名 week02_color
-開始畫茶壺
+開始畫茶壺，程式碼:
+
 ///step02-1 10行最精簡的 GLUT程式
 ///先全刪，目標: 5-10行寫完
 #include <GL/glut.h> ///使用GLUT外掛，簡化程式
@@ -59,4 +60,42 @@ int main(int argc, char** argv) ///main()主函式 進階版
 
     glutMainLoop(); ///主要的程式迴圈
 }
+```
+## step03 學範例畫出自己的彩色三角形
+```C++
+///step02-1 10行最精簡的 GLUT程式
+///先全刪，目標: 5-10行寫完
+#include <GL/glut.h> ///使用GLUT外掛，簡化程式
+
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glColor3f(1,1,0); ///設定色彩
+    ///glutSolidTeapot(0.3); ///實心的茶壺 不做茶壺了所以註解掉
+    glBegin(GL_POLYGON);
+        glColor3f(1,0,0); ///紅色
+        glVertex2f(-1,-1); ///Vertex 頂點
+
+        glColor3f(0,1,0); ///綠色
+        glVertex2f(+1,-1);
+
+        glColor3f(0,0,1); ///藍色
+        glVertex2f(0,+1);
+    glEnd();
+
+    glutSwapBuffers(); ///畫好後，交換出來
+}
+
+int main(int argc, char** argv) ///main()主函式 進階版
+{
+    glutInit( &argc, argv); ///把參數，送給 glutInit 初始化
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH ); ///雙緩衝區 + 3D深度功能
+    glutCreateWindow("第02週的彩色三角形程式哦!"); ///開 GLUT 視窗
+
+    glutDisplayFunc(display); ///用來顯示的函式
+
+    glutMainLoop(); ///主要的程式迴圈
+}
+
 ```
