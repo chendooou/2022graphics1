@@ -1,6 +1,64 @@
+# week01 20220301
+```
+小葉老師的上課要點
+1. What 這問課會學到什麼 (用期末作品來思考, 三個圈圈, blog)
+2. How 如何學 (錄影、截圖、實作、Blog、GitHub)
+3. 成績計算方式 (期中考10%) (平時90%: Blog20%, Moodle(作業/考試)40%, 期末作品40%)
+4. 教學方法: 點名/座位表, moodle, blogger, facebook
+5. 第1個 OpenGL程式
+6. 討論: 放假(W07清明)與期末作品展示
+```
+## 第一個 OpenGL 程式
+```
+0.CodeBlocks 17.12 mingw 裝好
+1.File > New > Project, 選 OpenGL 專案
+2.檔案名稱取Project title: week01_OPENGL
+   點開[...]的目錄，路徑選桌面
+3.下一步下一步，完成後，Build & Run
+4.可以看到旋轉的彩色三角形
+```
+## 第一個GLUT專案
+```
+1.moodle下載freeglut壓縮檔
+2.解壓縮到桌面的freeglut目錄
+3.freeglut/lib/libfreeglut.a
+桌面 freeglut 的1ib裡面有 1ibfreeglut.a把它複製，改成 1ibglut32.a
+才能讓我們的 CodeBlocks 的 GLUT專案連結使用
+4. 打開CodeBlocks：
+    File > New > Project，選GLUT專案 > go > next > 
+    Project title 取名 week01_GLUT
+    路徑選擇在桌面 > next
+5.選擇路徑並且存在桌面的freeglut目錄
+6. 完成後，Build&Run。按+ - 可以調整精細程度
+```
+## 使用 Github 和 Git 指令來備份程式資料
+```
+0. 登入 GitHub.com
+1. New repo 新增專案倉庫
+1.1 取名 2022graphics1
+1.2. Public, Add READMD,  Add .gitignore 用c++
+1.3.綠色確認，看到新的專案倉庫
+2. 利用 Git 指令
+2.1 安裝 Git for Windows
+3. 開啟 Git Bash
+3.1 輸入指令進入桌面: cd desktop
+3.2 : git clone https://(我的github網址)
+3.3 : cd 2022graphics1
+3.4 把2個程式目錄，放到2022graphics1
+3.5  : git status 看狀態(紅色2個目錄)
+3.6  : git add . 
+3.7 : git status (變綠色)
+4. 要推送上雲端
+4.1 要先有 commit 的動作，第一次使用時
+git config --global user.email "(信箱)"
+git config --global user.name "(github名字)"
+git commit -m "訊息"
+4.2  : git push 推送上雲端
+```
 
 # week02 20220308
 ```
+小葉老師的上課要點
 1. 主題: 點、線、面、色彩
 2. 親手打造第1個GLUT程式
 3. 實作程式
