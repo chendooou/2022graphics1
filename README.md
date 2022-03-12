@@ -157,3 +157,460 @@ int main(int argc, char** argv) ///main()主函式 進階版
 }
 
 ```
+# 電腦圖學筆記week03 -20220308
+```
+小葉老師上課要點:
+1. 主題: 移動 Translate、座標換算
+2. 實作: glTranslatef(x,y,z);
+3. 主題: 滑鼠事件 glutMouseFunc()
+4. 用滑鼠寫程式
+5. 作業2: 很多點畫酷東西 (小畫家協助)
+```
+## 能夠讓作業加分的一些東東
+```C++
+1.建立GLUT專案
+   位置要放在freeglut資料夾目錄
+2.先copy上週得程式碼雛形，以下:
+
+#include <GL/glut.h> 
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glutSwapBuffers(); ///畫好後，交換出來
+}
+int main(int argc, char** argv) 
+{
+    glutInit( &argc, argv); 
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH ); ///雙緩衝區 + 3D深度功能
+    glutCreateWindow("week03 作業2想加分"); 
+
+    glutDisplayFunc(display); 
+    glutMainLoop(); 
+}
+```
+
+## 開始畫小小兵
+```C++
+#include <GL/glut.h>
+#include <math.h>
+void myCircle( float r)
+{
+    glBegin(GL_POLYGON);
+    for(float a=0; a<3.1415926*2; a+=0.01){
+        glVertex2f( r*cos(a) , r*sin(a) );
+    }///要畫三角函數
+    glEnd();
+}
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glColor3f( 1,1,0 );
+    myCircle(2);
+    glColor3f( 0.6 ,0.6,0.6 );
+    myCircle(0.6);
+    glColor3f( 1,1,1);
+    myCircle(0.45);
+    glColor3f( 0,0,0 );
+    myCircle(0.3);
+    glutSwapBuffers(); ///畫好後，交換出來
+}
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH ); ///雙緩衝區 + 3D深度功能
+    glutCreateWindow("week03 作業2想加分");
+    glutDisplayFunc(display);
+    glutMainLoop();
+}
+
+但是需要腮紅，所以要改良增加座標
+#include <GL/glut.h>
+#include <math.h>
+void myCircle( float x , float y ,float r)
+{
+    glBegin(GL_POLYGON);
+    for(float a=0; a<3.1415926*2; a+=0.01){
+        glVertex2f( x+r*cos(a) , y+r*sin(a) );
+    }///要畫三角函數
+    glEnd();
+}
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glColor3f(1 , 1 , 0);
+    myCircle(0 , 0 , 2);
+
+    glColor3f(0.6 , 0.6 , 0.6);
+    myCircle(0 , 0 , 0.6);
+
+    glColor3f(1 , 1 , 1);
+    myCircle(0 , 0 , 0.45);
+
+    glColor3f(0 , 0 ,0);
+    myCircle(0, 0 ,0.3);
+
+    glColor3f(1 , 0 ,0);
+    myCircle(0.8, -0.6 ,0.1);
+    myCircle(-0.8, -0.6 ,0.1);
+    glutSwapBuffers(); ///畫好後，交換出來
+}
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH ); ///雙緩衝區 + 3D深度功能
+    glutCreateWindow("week03 作業2想加分");
+
+    glutDisplayFunc(display);
+    glutMainLoop();
+}
+
+但是腮紅要橢圓，所以在定義一個myCircle2畫橢圓
+#include <GL/glut.h>
+#include <math.h>
+void myCircle( float x , float y ,float r)
+{
+    glBegin(GL_POLYGON);
+    for(float a=0; a<3.1415926*2; a+=0.01){
+        glVertex2f( x+r*cos(a) , y+r*sin(a) );
+    }///要畫三角函數
+    glEnd();
+}
+void myCircle2( float x , float y ,float r)
+{
+    glBegin(GL_POLYGON);
+    for(float a=0; a<3.1415926*2; a+=0.01){
+        glVertex2f( x+2*r*cos(a) , y+r*sin(a) );
+    }///要畫三角函數
+    glEnd();
+}
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glColor3f(1 , 1 , 0);
+    myCircle(0 , 0 , 2);
+
+    glColor3f(0.6 , 0.6 , 0.6);
+    myCircle(0 , 0 , 0.6);
+
+    glColor3f(1 , 1 , 1);
+    myCircle(0 , 0 , 0.45);
+
+    glColor3f(0 , 0 ,0);
+    myCircle(0, 0 ,0.3);
+
+    glColor3f(1 , 0 ,0);
+    myCircle2(0.8, -0.6 ,0.1); ///從圓改良為橢圓
+    myCircle2(-0.8, -0.6 ,0.1);///從圓改良為橢圓
+    glutSwapBuffers(); ///畫好後，交換出來
+}
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH ); ///雙緩衝區 + 3D深度功能
+    glutCreateWindow("week03 作業2想加分");
+
+    glutDisplayFunc(display);
+    glutMainLoop();
+}
+```
+## 重點整理
+```
+01. glBegin(); //開始畫
+
+      glEnd(); //結束畫 
+
+02. glVertex2f( , );  //Vertex是頂點 , 2f所以兩個浮點數參數
+
+03. glColor3f ( ,  ,  );  //3f所以三個浮點數參數
+
+04. 使用 sin , cos , 圓一圈要2拍 , for迴圈 , 函式
+```
+## 移動 Translate
+```
+1. 進入小葉老師的網址 https://jsyeh.org/3dcg10
+    下載三個檔案 data. zip , windows zip ,glut32.d11
+
+2. windows.zip 解壓縮 > 下載 \ windows \ Shapes .exe
+    data.zip 解壓縮＞下載 \ windows \ data \ 模型
+    glut32.d11 解壓縮 > 下載 \ windows \ glut32.d11
+
+3.執行 > 下載 \ window \ Transformation.exe 看範例
+拖曳下方綠色數值(glRotatef)可以旋轉車子
+上面右方按右鍵可以選擇其他項目的模型
+```
+
+## 實作 Transformation 的 GLUT 程式 
+```C++
+1.建立新的 GLUT 專案,檔名為: week03_translate
+2.先畫一個上周的茶壺出來
+   * 這個茶壺不會動
+   
+#include <GL/glut.h>
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glColor3f(1,1,0); ///黃色
+    glutSolidTeapot(0.3); ///茶壺
+
+    glutSwapBuffers(); 
+}
+
+int main(int argc, char** argv) 
+{
+    glutInit( &argc, argv); 
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH ); 
+    glutCreateWindow("第02週的程式哦!"); 
+
+    glutDisplayFunc(display); 
+
+    glutMainLoop();
+}
+```
+```C++
+* 使茶壺往右上角移動
+  結果茶壺出現在右上角的位置了，然後再點一次就又往右上角移動，然後會跑出視窗外
+  移動會累積，因為它會修改矩陣
+#include <GL/glut.h>
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    ///移動會累積,因為它會修改矩陣
+    glTranslatef(0.5 , 0.5 , 0);///右上角
+    glColor3f(1,1,0); ///黃色
+    glutSolidTeapot(0.3); ///茶壺
+
+    glutSwapBuffers();
+}
+
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    glutCreateWindow("week03 移動");
+
+    glutDisplayFunc(display);
+
+    glutMainLoop();
+}
+```
+```C++
+* 加上備份/還原矩陣，茶壺不會點一下就跑走了
+    glPushMatrix();
+    glPopMatrix();
+    
+#include <GL/glut.h>
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glPushMatrix();///備份矩陣，他會記住舊的位置
+        ///移動會累積,因為它會修改矩陣
+        glTranslatef(0.5 , 0.5 , 0);///右上角
+        glColor3f(1,1,0); ///黃色
+        glutSolidTeapot(0.3); ///茶壺
+    glPopMatrix();///還原矩陣，會還原舊的位置
+    glutSwapBuffers();
+}
+
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    glutCreateWindow("week03 移動");
+
+    glutDisplayFunc(display);
+
+    glutMainLoop();
+}
+```
+```C++
+* 想要四個茶壺
+   建立一個myTeapot函式，給能夠修改的x,y座標
+   畫茶壺輸入四個座標就有四個茶壺
+   
+#include <GL/glut.h>
+void myTeapot( float x , float y )
+{
+    glPushMatrix();///備份矩陣，他會記住舊的位置
+        ///移動會累積,因為它會修改矩陣
+        //glTranslatef(0.5 , 0.5 , 0);///右上角
+        glTranslatef(x,y,0);
+        glColor3f(1,1,0); ///黃色
+        glutSolidTeapot(0.3); ///茶壺
+    glPopMatrix();///還原矩陣，會還原舊的位置
+}
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    myTeapot(0.5,0.5);
+    myTeapot(0.5,-0.5);
+    myTeapot(-0.5,-0.5);
+    myTeapot(-0.5,0.5);
+    glutSwapBuffers();
+}
+
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    glutCreateWindow("week03 移動");
+
+    glutDisplayFunc(display);
+
+    glutMainLoop();
+}
+
+```
+
+## 滑鼠事件 glutMouseFunc()
+```C++
+* 使用滑鼠事件實現滑鼠點在哪,茶壺就移動到哪
+#include <GL/glut.h>
+float mouseX=0, mouseY=0;///新加的!!!!
+void myTeapot( float x , float y )
+{
+    glPushMatrix();///備份矩陣，他會記住舊的位置
+        glTranslatef(x,y,0);
+        glColor3f(1,1,0); ///黃色
+        glutSolidTeapot(0.3); ///茶壺
+    glPopMatrix();///還原矩陣，會還原舊的位置
+}
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    myTeapot( (mouseX-150)/150.0, -(mouseY-150)/150.0);///新加的
+    glutSwapBuffers();
+}
+void mouse( int button, int state, int x, int y ) ///滑鼠x座標,滑鼠y座標!!!!
+{
+    mouseX=x; mouseY=y;///新加的!!!!
+}
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    glutCreateWindow("week03 移動");
+
+    glutDisplayFunc(display);
+    glutMouseFunc(mouse);///新加的 滑鼠事件!!!!
+    glutMainLoop();
+}
+```
+
+## 用滑鼠寫程式
+```C++
+1.建立新的GLUT專案，檔名:week03_mouse_hw2
+
+2.將week03_mouse的程式碼copy過來
+
+3.增加兩行程式碼
+   #include <stdio.h> ///printf()印東西用的
+   printf("%d %d %d %d\n", button, state, x, y);
+
+4.縮小茶壺: glutSolidTeapot(0.1);  ///變成小茶壺 
+
+* mose 的座標系統，也是 window 視窗的座標系統
+  座標轉換: 可把 mouse (0...300 , 0...300)換算成 3D 的世界(-1...+1 , -1...+1)  
+   (mouseX-150)/150.0, -(mouseY-150)/150.0) 
+  口訣: 減一半、除一半。y要反過來
+  
+///week03_mouse_help_hw2
+#include <GL/glut.h>
+#include <stdio.h> ///printf()印東西用的
+float mouseX=0, mouseY=0;///新加的!!!!
+void myTeapot( float x , float y )
+{
+    glPushMatrix();///備份矩陣，他會記住舊的位置
+        glTranslatef(x,y,0);
+        glColor3f(1,1,0); ///黃色
+        glutSolidTeapot(0.1); ///變成小茶壺
+    glPopMatrix();///還原矩陣，會還原舊的位置
+}
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    myTeapot( (mouseX-150)/150.0, -(mouseY-150)/150.0);///新加的
+    glutSwapBuffers();
+}
+void mouse( int button, int state, int x, int y ) ///滑鼠x座標,滑鼠y座標!!!!
+{
+    printf("%d %d %d %d\n", button, state, x, y);
+    mouseX=x; mouseY=y;///新加的!!!!
+}
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    glutCreateWindow("week03 移動");
+
+    glutDisplayFunc(display);
+    glutMouseFunc(mouse);///新加的 滑鼠事件!!!!
+    glutMainLoop();
+}
+
+```
+
+## 用滑鼠寫程式
+```C++
+1. 模仿茶壺程式碼，放到滑鼠事件
+2. 在 "week03 移動" 視窗滑鼠點一下就會產生一行程式碼，放開滑鼠也會產生一行程式碼
+    可以這樣在視窗上點出???的輪廓
+    
+///week03_mouse_help_hw2
+#include <GL/glut.h>
+#include <stdio.h> ///printf()印東西用的
+float mouseX=0, mouseY=0;///新加的!!!!
+void myTeapot( float x , float y )
+{
+    glPushMatrix();///備份矩陣，他會記住舊的位置
+        glTranslatef(x,y,0);
+        glColor3f(1,1,0); ///黃色
+        glutSolidTeapot(0.1); ///變成小茶壺
+    glPopMatrix();///還原矩陣，會還原舊的位置
+}
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    ///myTeapot( (mouseX-150)/150.0, -(mouseY-150)/150.0);///新加的
+
+    glutSwapBuffers();
+}
+void mouse( int button, int state, int x, int y ) ///滑鼠x座標,滑鼠y座標!!!!
+{
+    ///printf("%d %d %d %d\n", button, state, x, y);
+    printf(" glVertex2f( (%d-150)/150.0 , -(%d-150)/150.0 );\n",x,y);
+    mouseX=x; mouseY=y;///新加的!!!!
+}
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    glutCreateWindow("week03 移動");
+
+    glutDisplayFunc(display);
+    glutMouseFunc(mouse);///新加的 滑鼠事件!!!!
+    glutMainLoop();
+}
+
+3.將程式碼複製起來，貼到 bonus 去測試
+
+4.程式碼測試出來的詭異多邊形，就是利用滑鼠事件繪製出來點接起來的模樣
+
+* 注意: 左側深黑色的檔名是目前會執行的程式碼，欲切換其他檔案: 對該檔名點右鍵 > Activate project
+```
+
+## 用小畫家寫作業
+```
+1.開啟小畫家，將畫布大小設為300*300像素(windows視窗預設一樣)
+
+2.鼠標停在畫布上，從左下角就可以從像素得知x,y座標
+
+3.可以用滴管吸顏色、點擊編輯色彩，就可以知道顏色的RGB
+
+4.但是GLUT顏色值表示只能介於0-1之間怎麼辦?
+   : 將RGB各/255.0
+    e.g 某黃色RGB為255,208,32，寫到GLUT : glColor3f(255/255.0 , 208/255.0 , 32/255.0 )
+```
