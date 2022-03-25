@@ -614,3 +614,285 @@ int main(int argc, char** argv)
    : 將RGB各/255.0
     e.g 某黃色RGB為255,208,32，寫到GLUT : glColor3f(255/255.0 , 208/255.0 , 32/255.0 )
 ```
+
+# 電腦圖學筆記week04 -20220315
+```
+week04 -20220315
+小葉老師上課要點:
+1. 主題: 旋轉 Rotate jsyeh.org/3dcg10
+2. 主題: 旋轉軸、旋轉角度
+3. 實作: glRotatef(angle, x,y,z);
+4. 主題: mouse motion 動
+5. mouse motion 配合旋轉
+6. (大象放進冰箱)
+(可能教太快,重講 mouse 寫程式、GL_LINE_LOOP)
+```
+## 旋轉 Rotate 
+```
+1. 進入小葉老師的網址 https://jsyeh.org/3dcg10
+    下載三個檔案 data. zip , windows zip ,glut32.d11
+
+2. windows.zip 解壓縮 > 下載 \ windows \ Shapes .exe
+    data.zip 解壓縮＞下載 \ windows \ data \ 模型
+    glut32.d11 解壓縮 > 下載 \ windows \ glut32.d11
+
+3.執行 > 下載 \ window \ Transformation.exe 看範例
+  拖曳下方綠色數值(glRotatef)可以旋轉車子
+  點選上方右鍵選取Al Capone(人物)
+  
+4.紫色框起來是旋轉軸，旋轉軸的前一個數字是選轉角度。
+   根據安培右手定理，比讚的四隻手指頭方向決定選轉方向
+   (0,1,0 固定y軸 讚向上 旋轉軸方向向上) 
+   (1,0,0 固定x軸 讚向右 往前轉)
+   (0,0,1 固定z軸 讚向自己胸前 往左邊轉)
+
+   *右手座標: 拇指x座標、食指y座標、中指z座標
+   
+```
+## 實作 Rotate 的 GLUT 程式
+```C
+1.建立新的 GLUT 專案,檔名為: week03_translate 
+2.先從上周的筆記(備份/還原茶壺)複製精簡的10行程式碼
+   改寫單純在那邊的旋轉90度茶壺
+#include <GL/glut.h>
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glPushMatrix(); ///備份矩陣
+        glRotatef(90,0,0,1);
+        glutSolidTeapot(0.3);
+    glPopMatrix(); ///還原矩陣
+    glutSwapBuffers();
+}
+
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    glutCreateWindow("week04 Rotate");
+
+    glutDisplayFunc(display);
+
+    glutMainLoop();
+}
+```
+## 實作 Rotate 加上 motion 的 GLUT 程式
+```C
+可以使用滑鼠拖曳茶壺使轉動了!
+   新增第25行: glutMotionFunc(motion); ///mouse motion動
+   新增第14行:motion的函式，給一個angle使可以修改的數值
+   修改第9行:把原本固定的90度改成可以修改的angle
+   新增第4行:宣告angle
+    
+   但是有瑕疵: 按下滑鼠拖曳放開後，再按下滑鼠又重回上方的位置
+   原因: 第16行程式碼 angle = x; 
+           x 為x座標(1,0,0)
+///上週使用mouse ,這週使用mouse motion
+/// mouse
+#include <GL/glut.h>
+float angle=0;
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glPushMatrix();///備份矩陣
+        glRotatef(angle,0,0,1); ///90改成angle
+        glutSolidTeapot(0.3);
+    glPopMatrix();///還原矩陣
+    glutSwapBuffers();
+}
+void motion(int x, int y)
+{
+    angle = x;
+    display(); ///重畫畫面
+}
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    glutCreateWindow("week04 Rotate");
+    glutDisplayFunc(display);
+    glutMotionFunc(motion); ///mouse motion動
+    glutMainLoop();
+}
+```
+## 實作 Rotate 加上 motion 再加上 mouse 繼續改良 GLUT 程式
+```C
+* 如何改良: 冰箱門打開 、 大型放進去、 冰箱關起來
+           滑鼠按下去 、 滑鼠拖曳  、 滑鼠放開來 
+           
+新增第32行: glutMouseFunc(mouse); ///上週教: mouse按下去、放開來
+新增第20行: 定義mouse函式，紀錄舊的位置(定錨)
+更新第3行: 宣告oldX=0;
+這樣就可以成功進行持續且順利的旋轉茶壺了!!
+
+///上週使用mouse ,這週使用mouse motion
+#include <GL/glut.h>
+float angle=0, oldX=0; ///oldx 用來記住舊的位置(定錨)
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glPushMatrix();///備份矩陣
+        glRotatef(angle,0,0,1); ///90改成angle
+        glutSolidTeapot(0.3);
+    glPopMatrix();///還原矩陣
+    glutSwapBuffers();
+}
+void motion(int x, int y)
+{
+    //angle = x; 改掉
+    angle += (x-oldX); ///新的點
+    oldX = x; ///記住舊的點
+    display(); ///重畫畫面
+}
+void mouse(int button,int state, int x, int y)
+{
+    oldX = x; ///定錨
+}
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    glutCreateWindow("week04 Rotate");
+
+    glutDisplayFunc(display);
+    glutMotionFunc(motion); ///mouse motion動
+    glutMouseFunc(mouse); ///上週教: mouse按下去、放開來
+    glutMainLoop();
+}
+```
+## 重新複習滑鼠寫程式
+```
+1.建立新的GLUT專案:week04_review_mouse_draw
+
+2.第12行:printf("%d %d %d %d\n", button, state, x, y);
+  button : 0代表按下左鍵、1代表按下中鍵、2代表按下右鍵
+```
+```C
+///複習滑鼠畫東西
+#include <GL/glut.h>
+#include <stdio.h>
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glutSwapBuffers();
+}
+void mouse(int button,int state, int x, int y)
+{
+    printf("%d %d %d %d\n", button, state, x, y);
+}
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    glutCreateWindow("week04_review_mouse_draw");
+
+    glutDisplayFunc(display);
+    glutMouseFunc(mouse); ///上週教: mouse按下去、放開來
+    glutMainLoop();
+}
+```
+```
+3.改寫第12行: printf("   glVertex2f( (%d-150)/150.0, (%d-150/150.0);\n" ,x,y);
+             可以印出滑鼠按下去位置的座標和放開滑鼠位置的座標
+```
+```C
+///複習滑鼠畫東西
+#include <GL/glut.h>
+#include <stdio.h>
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glutSwapBuffers();
+}
+void mouse(int button,int state, int x, int y)
+{//printf("%d %d %d %d\n", button, state, x, y);
+    printf("   glVertex2f( (%d-150)/150.0, (%d-150/150.0);\n" ,x,y);
+}
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    glutCreateWindow("week04_review_mouse_draw");
+
+    glutDisplayFunc(display);
+    glutMouseFunc(mouse); ///上週教: mouse按下去、放開來
+    glutMainLoop();
+}
+```
+```
+4.增加第12行: 修改程式碼為印出按下去的滑鼠位置座標就好
+   * 問題: 黑壓壓的點根本看不出畫了什麼
+```
+```C
+///複習滑鼠畫東西
+#include <GL/glut.h>
+#include <stdio.h>
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glutSwapBuffers();
+}
+void mouse(int button,int state, int x, int y)
+{//printf("%d %d %d %d\n", button, state, x, y);
+    if(state==GLUT_DOWN){///耴果state是按下去0,才印程式碼
+        printf("   glVertex2f( (%d-150)/150.0, (%d-150/150.0);\n" ,x,y);
+    }
+}
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    glutCreateWindow("week04_review_mouse_draw");
+
+    glutDisplayFunc(display);
+    glutMouseFunc(mouse); ///上週教: mouse按下去、放開來
+    glutMainLoop();
+}
+```
+```
+5. * 問題: 黑壓壓的點根本看不出畫了什麼，所以從x,y去做修改看看
+       
+       增加第4-5行 : mx,my用來記錄點的位置
+       增加第9-13行: 把點們用LINE_LOOP和神奇for迴圈連起來
+       增加第18-23行: 讓小黑顯示座標
+ ```
+ ```C
+///複習滑鼠畫東西
+#include <GL/glut.h>
+#include <stdio.h>
+int mx[1000],my[1000];///用來備份你的mouse的座標
+int N=0;///有幾個點按好了?
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glBegin(GL_LINE_LOOP);
+    for(int i=0; i<N; i++){
+        glVertex2f( (mx[i]-150)/150.0, -(my[i]-150)/150.0);
+    }
+    glEnd();
+    glutSwapBuffers();
+}
+void mouse(int button,int state, int x, int y)
+{//printf("%d %d %d %d\n", button, state, x, y);
+    if(state==GLUT_DOWN){///如果state是按下去0,才印程式碼
+        printf("   glVertex2f( (%d-150)/150.0, (%d-150/150.0);\n" ,x,y);
+        N++;
+        mx[N-1]=x; my[N-1]=y;
+    }
+    display();
+}
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    glutCreateWindow("week04_review_mouse_draw");
+
+    glutDisplayFunc(display);
+    glutMouseFunc(mouse); ///上週教: mouse按下去、放開來
+    glutMainLoop();
+}
+
+```
