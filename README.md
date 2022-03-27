@@ -1,5 +1,5 @@
 # 電腦圖學筆記week01 -20220222
-```
+
 小葉老師的上課要點
 1. What 這問課會學到什麼 (用期末作品來思考, 三個圈圈, blog)
 2. How 如何學 (錄影、截圖、實作、Blog、GitHub)
@@ -7,7 +7,7 @@
 4. 教學方法: 點名/座位表, moodle, blogger, facebook
 5. 第1個 OpenGL程式
 6. 討論: 放假(W07清明)與期末作品展示
-```
+
 ## 第一個 OpenGL 程式
 ```
 0.CodeBlocks 17.12 mingw 裝好
@@ -57,7 +57,7 @@ git commit -m "訊息"
 ```
 
 # 電腦圖學筆記week02 -20220301
-```
+
 小葉老師的上課要點
 1. 主題: 點、線、面、色彩
 2. 親手打造第1個GLUT程式
@@ -67,7 +67,7 @@ git commit -m "訊息"
 3.3. glVertex3f(x,y,z); 頂點 Vertex
 3.4. glEnd(); 結束畫 
 4. 小畫家配合回家作業
-```
+
 ## step01 跑別人的範例
 ```
 1. 進入小葉老師的網址 https://jsyeh.org/3dcg10
@@ -158,14 +158,14 @@ int main(int argc, char** argv) ///main()主函式 進階版
 
 ```
 # 電腦圖學筆記week03 -20220308
-```
+
 小葉老師上課要點:
 1. 主題: 移動 Translate、座標換算
 2. 實作: glTranslatef(x,y,z);
 3. 主題: 滑鼠事件 glutMouseFunc()
 4. 用滑鼠寫程式
 5. 作業2: 很多點畫酷東西 (小畫家協助)
-```
+
 ## 能夠讓作業加分的一些東東
 ```C++
 1.建立GLUT專案
@@ -616,7 +616,7 @@ int main(int argc, char** argv)
 ```
 
 # 電腦圖學筆記week04 -20220315
-```
+
 week04 -20220315
 小葉老師上課要點:
 1. 主題: 旋轉 Rotate jsyeh.org/3dcg10
@@ -626,7 +626,7 @@ week04 -20220315
 5. mouse motion 配合旋轉
 6. (大象放進冰箱)
 (可能教太快,重講 mouse 寫程式、GL_LINE_LOOP)
-```
+
 ## 旋轉 Rotate 
 ```
 1. 進入小葉老師的網址 https://jsyeh.org/3dcg10
@@ -650,7 +650,7 @@ week04 -20220315
    
 ```
 ## 實作 Rotate 的 GLUT 程式
-```C
+```C++
 1.建立新的 GLUT 專案,檔名為: week03_translate 
 2.先從上周的筆記(備份/還原茶壺)複製精簡的10行程式碼
    改寫單純在那邊的旋轉90度茶壺
@@ -677,7 +677,7 @@ int main(int argc, char** argv)
 }
 ```
 ## 實作 Rotate 加上 motion 的 GLUT 程式
-```C
+```C++
 可以使用滑鼠拖曳茶壺使轉動了!
    新增第25行: glutMotionFunc(motion); ///mouse motion動
    新增第14行:motion的函式，給一個angle使可以修改的數值
@@ -716,7 +716,7 @@ int main(int argc, char** argv)
 }
 ```
 ## 實作 Rotate 加上 motion 再加上 mouse 繼續改良 GLUT 程式
-```C
+```C++
 * 如何改良: 冰箱門打開 、 大型放進去、 冰箱關起來
            滑鼠按下去 、 滑鼠拖曳  、 滑鼠放開來 
            
@@ -767,7 +767,7 @@ int main(int argc, char** argv)
 2.第12行:printf("%d %d %d %d\n", button, state, x, y);
   button : 0代表按下左鍵、1代表按下中鍵、2代表按下右鍵
 ```
-```C
+```C++
 ///複習滑鼠畫東西
 #include <GL/glut.h>
 #include <stdio.h>
@@ -825,7 +825,7 @@ int main(int argc, char** argv)
 4.增加第12行: 修改程式碼為印出按下去的滑鼠位置座標就好
    * 問題: 黑壓壓的點根本看不出畫了什麼
 ```
-```C
+```C++
 ///複習滑鼠畫東西
 #include <GL/glut.h>
 #include <stdio.h>
@@ -859,7 +859,7 @@ int main(int argc, char** argv)
        增加第9-13行: 把點們用LINE_LOOP和神奇for迴圈連起來
        增加第18-23行: 讓小黑顯示座標
  ```
- ```C
+ ```C++
 ///複習滑鼠畫東西
 #include <GL/glut.h>
 #include <stdio.h>
@@ -895,4 +895,303 @@ int main(int argc, char** argv)
     glutMainLoop();
 }
 
+```
+# 電腦圖學筆記week05 -20220322
+小葉老師上課要點:
+1. 主題: 移動、旋轉、縮放、矩陣
+2. 主題: 鍵盤函式 glutKeyboardFunc()
+3. 複習: 鍵盤+滑鼠操作, 模仿 Maya/Unity介面
+4. 主題: 電腦圖學之父 Ivan Sutherland (Sketchpad)
+
+## 電腦圖學之父 Ivan Sutherland (Sketchpad)
+```
+伊凡·愛德華·蘇澤蘭 Ivan Edward Sutherland
+生於美國內布拉斯加州黑斯廷斯，計算機科學家，被認為是「計算機圖形學之父」。因發明Sketchpad，拓展了計算機圖形學的領域，為1988年圖靈獎得主。
+
+```
+## 實作GLUT程式碼 - keyboard 函式
+```
+1. 進入小葉老師的網址 https://jsyeh.org/3dcg10
+    下載三個檔案 data. zip , windows zip ,glut32.d11
+
+2. windows.zip 解壓縮 > 下載 \ windows \ Shapes .exe
+    data.zip 解壓縮＞下載 \ windows \ data \ 模型
+    glut32.d11 解壓縮 > 下載 \ windows \ glut32.d11
+
+3.執行 > 下載 \ window \ Transformation.exe 看範例
+  拖曳下方綠色數值(glRotatef)可以旋轉車子
+  點選上方右鍵選取Al Capone(人物)
+
+4.裝好 freeglut 資料夾到桌面，改lib\libglut32.a
+   並開啟 codeblocks 建立新的 GLUT 專案: week05_keyboard
+
+5.先打上基礎10行程式碼
+```
+```C++
+#include <GL/glut.h>
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glutSwapBuffers();
+}
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    glutCreateWindow("week??_xxx");
+
+    glutDisplayFunc(display);
+    glutMainLoop();
+}
+
+```
+```
+6.用黃色小茶壺做一些神奇的事情
+   *增加第21行: keyboard 函式
+     增加第10行: 寫 keyboard 函式要做的事
+     增加第3行 display 函式裡的印出之前的黃色小茶壺
+     增加第2行: 因為第12行要用printf，所以要加標頭檔#include <stdio.h>
+     
+  當滑鼠停在茶壺小視窗中任一地方，並按下鍵盤中英文字母，小黑視窗會印出你按下了什麼
+  英文字母和滑鼠所在的座標。
+
+```
+```
+7.什麼是 Callback ?
+   程式碼第20、21行就是 Callback 函式。在main函式外面寫了函式，當main函式迴圈在執
+   行時，跑到需要使用函式就會去叫用註冊對應的 Callback 函式名字。
+   第10行: keyboard函式內的參數細說
+               char 代表字母: -128..+127
+               unsigned char :0...255 只有正的
+               singed 正負號、unsigned 沒有正負號
+```
+```C++
+#include <GL/glut.h>
+#include <stdio.h>
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glColor3f(1,1,0);
+    glutSolidTeapot(0.3);
+    glutSwapBuffers();
+}
+void keyboard( unsigned char key,int x,int y )
+{
+    printf("你按下了 %c 在 %d %d 座標\n", key ,x, y);
+}
+int main(int argc, char**argv)
+{
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("week05_keyboard");
+
+    glutDisplayFunc(display);
+    glutKeyboardFunc(keyboard); ///今天的主角
+    glutMainLoop();
+}
+```
+
+## 實作GLUT程式碼 - keyboard函式 + mouse函式 + motion函式
+要做移動 + 旋轉 + 放大縮小
+
+```
+1. 建立新的 GLUT 專案: week05_keyboard_mouse_motion
+    接續剛剛的week05_keyboard 變成 keyboard函式 + mouse函式 + motion函式
+     先寫出三個函式
+```
+```C++
+///接續 week05_keyboard 變成 keyboard + mouse + motion
+#include <GL/glut.h>
+#include <stdio.h>
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glColor3f(1,1,0);
+    glutSolidTeapot(0.3);
+    glutSwapBuffers();
+}
+void keyboard( unsigned char key, int x, int y )
+{
+
+}
+void mouse(int button, int state, int x, int y)
+{
+
+}
+void motion (int x, int y)
+{
+
+}
+int main(int argc, char**argv)
+{
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("week05_keyboard");
+
+    glutDisplayFunc(display);
+    glutKeyboardFunc(keyboard); ///今天的主角
+    glutMouseFunc(mouse);///上上週的主角 滑鼠點擊放開
+    glutMotionFunc(motion);///上週的主角 滑鼠拖曳
+    glutMainLoop();
+}
+```
+```
+2. 先試試看移動，要做備分還原矩陣，才不會每執行一次就跑走。
+    增加9-13行: 備份、還原矩陣、學模型一樣建立移動的三個參數glTranslate(x,y,z)
+    增加第3行: 給x,y,z初始值 
+    修改第15、18、21的 x,y 改 mouseX, mouseY 避免和 glTranslate的 x,y 衝突
+    增加第23行: motion函式裡，加上只要有移動就重畫畫面的 display()，還有讓茶壺移動      的程式
+    再回去修改第10行 glTranslate 內的參數去正確的換算
+
+    這樣就可以按下滑鼠拉動茶壺了。
+
+```
+```C++
+///接續 week05_keyboard 變成 keyboard + mouse + motion
+#include <GL/glut.h>
+#include <stdio.h>
+float x=0, y=0, z=0;
+int oldX=0, oldY=0;
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glPushMatrix(); ///備份矩陣
+        glTranslatef( (x-150)/150.0 , -(y-150)/150.0 , z);
+        glColor3f(1,1,0);
+        glutSolidTeapot(0.3);
+    glPopMatrix();///還原矩陣
+    glutSwapBuffers();
+}
+void keyboard( unsigned char key, int mouseX, int mouseY )
+{
+
+}
+void mouse(int button, int state, int mouseX, int mouseY)
+{
+
+}
+void motion (int mouseX, int mouseY)
+{
+    x += (mouseX-oldX); y += (mouseY-oldY);
+    oldX = mouseX;      oldY = mouseY;
+    display();
+}
+int main(int argc, char**argv)
+{
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("week05_keyboard");
+
+    glutDisplayFunc(display);
+    glutKeyboardFunc(keyboard); ///今天的主角
+    glutMouseFunc(mouse);///上上週的主角 滑鼠點擊放開
+    glutMotionFunc(motion);///上週的主角 滑鼠拖曳
+    glutMainLoop();
+}
+
+```
+```
+3. 但是每點一次滑鼠都從點下去的地方拉動，要在原本停的地方繼續移動啦
+    修改第21行: 為了瞬間移動的這個問題
+    修改第4行: x=150,y=150，讓執行程式後茶壺一開始就顯示在視窗中央，而不是0,0的左
+    上角
+    新增第8行: 新增背景顏色 glClearColor()函式內有四個參數分別是 R,G,B,透明度
+```
+```C++
+///接續 week05_keyboard 變成 keyboard + mouse + motion
+#include <GL/glut.h>
+#include <stdio.h>
+float x=150, y=150, z=0;
+int oldX=0, oldY=0;
+void display()
+{
+    glClearColor( 0.5, 0.5, 0.5, 1 ); ///R,G,B,A 其中A為透明度，目前功能沒開
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glPushMatrix(); ///備份矩陣
+        glTranslatef( (x-150)/150.0 , -(y-150)/150.0 , z);
+        glColor3f(1,1,0);
+        glutSolidTeapot(0.3);
+    glPopMatrix();///還原矩陣
+    glutSwapBuffers();
+}
+void keyboard( unsigned char key, int mouseX, int mouseY )
+{
+
+}
+void mouse(int button, int state, int mouseX, int mouseY)
+{///為了解決瞬間移動的錯誤,我們改用正確的方式
+    oldX= mouseX; oldY= mouseY;
+}
+void motion (int mouseX, int mouseY)
+{
+    x += (mouseX-oldX); y += (mouseY-oldY);
+    oldX = mouseX;      oldY = mouseY;
+    display();
+}
+int main(int argc, char**argv)
+{
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("week05_keyboard");
+
+    glutDisplayFunc(display);
+    glutKeyboardFunc(keyboard); ///今天的主角
+    glutMouseFunc(mouse);///上上週的主角 滑鼠點擊放開
+    glutMotionFunc(motion);///上週的主角 滑鼠拖曳
+    glutMainLoop();
+}
+```
+```
+4. 接著做放大縮小，所以繼續修改程式碼
+    增加第12行: 學模型加入 glScalef 使可以縮放
+    修改第4行 : 宣告scale倍率
+    增加第27行: y方向正向移動 scale放大，負向移動 scale縮小
+
+```
+```C++
+///接續 week05_keyboard 變成 keyboard + mouse + motion
+#include <GL/glut.h>
+#include <stdio.h>
+float x=150, y=150, z=0, scale=1.0;
+int oldX=0, oldY=0;
+void display()
+{
+    glClearColor( 0.5, 0.5, 0.5, 1 ); ///R,G,B,A 其中A為透明度，目前功能沒開
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glPushMatrix(); ///備份矩陣
+        glTranslatef( (x-150)/150.0 , -(y-150)/150.0 , z);
+        glScalef(scale, scale, scale); ///都縮放成 scale倍
+        glColor3f(1,1,0);
+        glutSolidTeapot(0.3);
+    glPopMatrix();///還原矩陣
+    glutSwapBuffers();
+}
+void keyboard( unsigned char key, int mouseX, int mouseY )
+{
+
+}
+void mouse(int button, int state, int mouseX, int mouseY)
+{///為了解決瞬間移動的錯誤,我們改用正確的方式
+    oldX= mouseX; oldY= mouseY;
+}
+void motion (int mouseX, int mouseY)
+{
+    if( mouseX-oldX >0 ) scale *= 1.01; ///每天多努力1%,成長看得見
+    if( mouseY-oldY >0 ) scale *= 0.99;
+    ///x += (mouseX-oldX);  y += (mouseY-oldY);
+    oldX = mouseX;      oldY = mouseY;
+    display();
+}
+int main(int argc, char**argv)
+{
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("week05_keyboard");
+
+    glutDisplayFunc(display);
+    glutKeyboardFunc(keyboard); ///今天的主角
+    glutMouseFunc(mouse);///上上週的主角 滑鼠點擊放開
+    glutMotionFunc(motion);///上週的主角 滑鼠拖曳
+    glutMainLoop();
+}
 ```
