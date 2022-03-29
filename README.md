@@ -1195,3 +1195,342 @@ int main(int argc, char**argv)
     glutMainLoop();
 }
 ```
+# 電腦圖學筆記week06 -20220329
+小葉老師上課要點:
+1. 主題: 打光 Light
+2. 主題: 法向量 Normal
+    glNormal3f(nx,ny,nz)
+3. 複習: 上週移動、旋轉、縮放、矩陣
+4. 期中考題
+
+## 實作 GLUT 程式: 打光 Light 
+```
+1. 進入小葉老師的網址 https://jsyeh.org/3dcg10
+    下載三個檔案 data. zip , windows zip ,glut32.d11
+
+2. windows.zip 解壓縮 > 下載 \ windows \ Shapes .exe
+    data.zip 解壓縮＞下載 \ windows \ data \ 模型
+    glut32.d11 解壓縮 > 下載 \ windows \ glut32.d11
+
+3.執行 > 下載 \ window \ Light & Material.exe 看範例
+   左上角按右鍵可以換模型
+   左下角右鍵可以換 Material (材質)
+   
+   藍色箭頭指向的參數 glLightfv(...) 的 fv 是 float vector (陣列)
+   GLfloat light_pos[] = { -2.0 , 2.0 , 2.0 , 1.0 };
+   glLightfv( GL_LIGHT0 , GL_POSITION , 陣列 )
+               第幾個燈        設定位置
+4.裝好 freeglut 資料夾到桌面，改lib\libglut32.a
+   並開啟 codeblocks 建立新的 GLUT 專案: week06_light
+
+5.開始偷程式碼!! Ctrl + F 搜尋: light
+6.把這些複製起來
+7.結合之前的黃色小茶壺加上偷來的程式碼，幫黃色小茶壺打光
+   *要改一下z的打光位置，茶壺會比較亮
+```
+```C++
+#include <GL/glut.h>
+const GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
+const GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat light_position[] = { 2.0f, 5.0f, -5.0f, 0.0f };
+
+const GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
+const GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
+const GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat high_shininess[] = { 100.0f };
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glColor3f(1,1,0);
+    glutSolidTeapot(0.3);
+    glutSwapBuffers();
+}
+int main(int argc, char**argv)
+{
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("week06_light");
+
+    glutDisplayFunc(display);
+    ///偷來的程式碼，要放 glutCreateWindow()之後，才會有效
+    glEnable(GL_DEPTH_TEST);///開啟3D功能
+    glDepthFunc(GL_LESS);
+
+    glEnable(GL_LIGHT0);
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_LIGHTING);
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT,   mat_ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,   mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR,  mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, high_shininess);
+    ///放在 glutMainLoop()之前
+    glutMainLoop();///卡在這裡，之後的程式都不會執行
+}
+```
+## 實作 GLUT 程式: Light + mouse + motion + rotate (複習上週)
+```
+1.開啟 codeblocks 建立新的 GLUT 專案: week06_light_mouse_motion_rotate
+2.結合打光的程式碼和上週寫的 mouse函式 + motion函式
+```
+```C++
+#include <GL/glut.h>
+#include <stdio.h>
+const GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
+const GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat light_position[] = { 2.0f, 5.0f, -5.0f, 0.0f };
+
+const GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
+const GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
+const GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat high_shininess[] = { 100.0f };
+
+float x=150, y=150, z=0, scale=1.0;
+int oldX=0, oldY=0;
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glPushMatrix(); ///備份矩陣
+        glTranslatef( (x-150)/150.0 , -(y-150)/150.0 , z);
+        glScalef(scale, scale, scale); ///都縮放成 scale倍
+        glColor3f(1,1,0);
+        glutSolidTeapot(0.3);
+    glPopMatrix();///還原矩陣
+    glutSwapBuffers();
+}
+void mouse(int button, int state, int mouseX, int mouseY)
+{///為了解決瞬間移動的錯誤,我們改用正確的方式
+    oldX= mouseX; oldY= mouseY;
+}
+void motion (int mouseX, int mouseY)
+{
+    if( mouseX-oldX >0 ) scale *= 1.01; ///每天多努力1%,成長看得見
+    if( mouseY-oldY >0 ) scale *= 0.99;
+    ///x += (mouseX-oldX);  y += (mouseY-oldY);
+    oldX = mouseX;      oldY = mouseY;
+    display();
+}
+
+int main(int argc, char**argv)
+{
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("week06_light");
+
+    glutDisplayFunc(display);
+    ///偷來的程式碼，要放 glutCreateWindow()之後，才會有效
+    glEnable(GL_DEPTH_TEST);///開啟3D功能
+    glDepthFunc(GL_LESS);
+
+    glEnable(GL_LIGHT0);
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_LIGHTING);
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT,   mat_ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,   mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR,  mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, high_shininess);
+    ///放在 glutMainLoop()之前
+    glutMouseFunc(mouse);///上上週的主角 滑鼠點擊放開
+    glutMotionFunc(motion);///上週的主角 滑鼠拖曳
+    glutMainLoop();///卡在這裡，之後的程式都不會執行
+}
+```
+```C++
+3.加上旋轉 rotate
+   *黃色畫線的為新加和修改的程式碼
+   
+#include <GL/glut.h>
+#include <stdio.h>
+const GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
+const GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat light_position[] = { 2.0f, 5.0f, -5.0f, 0.0f };
+
+const GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
+const GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
+const GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat high_shininess[] = { 100.0f };
+
+float x=150, y=150, z=0, scale=1.0, angle=0.0; ///新加上angle
+int oldX=0, oldY=0;
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glPushMatrix(); ///備份矩陣
+        glTranslatef( (x-150)/150.0 , -(y-150)/150.0 , z);
+        glRotatef(angle, 0,1,0);///對y軸轉動
+        glScalef(scale, scale, scale); ///都縮放成 scale倍
+        glColor3f(1,1,0);
+        glutSolidTeapot(0.3);
+    glPopMatrix();///還原矩陣
+    glutSwapBuffers();
+}
+void mouse(int button, int state, int mouseX, int mouseY)
+{///為了解決瞬間移動的錯誤,我們改用正確的方式
+    oldX= mouseX; oldY= mouseY;
+}
+void motion (int mouseX, int mouseY)
+{
+    angle += (mouseX-oldX);///轉動
+    ///if( mouseX-oldX >0 ) scale *= 1.01; ///每天多努力1%,成長看得見
+    ///if( mouseY-oldY >0 ) scale *= 0.99;
+    ///x += (mouseX-oldX);  y += (mouseY-oldY);
+    oldX = mouseX;      oldY = mouseY;
+    display();
+}
+
+int main(int argc, char**argv)
+{
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("week06_light");
+
+    glutDisplayFunc(display);
+    ///偷來的程式碼，要放 glutCreateWindow()之後，才會有效
+    glEnable(GL_DEPTH_TEST);///開啟3D功能
+    glDepthFunc(GL_LESS);
+
+    glEnable(GL_LIGHT0);
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_LIGHTING);
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT,   mat_ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,   mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR,  mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, high_shininess);
+    ///放在 glutMainLoop()之前
+    glutMouseFunc(mouse);///上上週的主角 滑鼠點擊放開
+    glutMotionFunc(motion);///上週的主角 滑鼠拖曳
+    glutMainLoop();///卡在這裡，之後的程式都不會執行
+}
+```
+```C++
+4.再加入上週沒有完成的keyboard函式，讓鍵盤也發揮功用
+   *開啟 codeblocks 建立新的 GLUT 專案: week06_light_mouse_motion_rotate 
+   *黃色畫線的為新加和修改的程式碼，淺藍色是記得檢查要加上的函式
+   
+#include <GL/glut.h>
+#include <stdio.h>
+const GLfloat light_ambient[]  = { 0.0f, 0.0f, 0.0f, 1.0f };
+const GLfloat light_diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat light_specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat light_position[] = { 2.0f, 5.0f, -5.0f, 0.0f };
+
+const GLfloat mat_ambient[]    = { 0.7f, 0.7f, 0.7f, 1.0f };
+const GLfloat mat_diffuse[]    = { 0.8f, 0.8f, 0.8f, 1.0f };
+const GLfloat mat_specular[]   = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat high_shininess[] = { 100.0f };
+
+float x=150, y=150, z=0, scale=1.0, angle=0.0; ///新加上angle
+int oldX=0, oldY=0, now=1; ///now:1 移動 , now:2 轉動 , now:3 縮放
+void display()
+{
+    glClearColor( 0.5, 0.5, 0.5, 1 ); ///R,G,B,A 其中A為透明度，目前功能沒開
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glPushMatrix(); ///備份矩陣
+        glTranslatef( (x-150)/150.0 , -(y-150)/150.0 , z);
+        glRotatef(angle, 0,1,0);///對y軸轉動
+        glScalef(scale, scale, scale); ///都縮放成 scale倍
+        glColor3f(1,1,0);
+        glutSolidTeapot(0.3);
+    glPopMatrix();///還原矩陣
+    glutSwapBuffers();
+}
+void keyboard( unsigned char key, int mouseX, int mouseY )
+{
+    if(key=='1' || key=='w' || key=='W')now=1; ///移動
+    if(key=='2' || key=='e' || key=='E')now=2; ///轉動
+    if(key=='3' || key=='r' || key=='R')now=3; ///縮放
+}
+void mouse(int button, int state, int mouseX, int mouseY)
+{///為了解決瞬間移動的錯誤,我們改用正確的方式
+    oldX= mouseX; oldY= mouseY;
+}
+void motion (int mouseX, int mouseY)
+{
+    if(now==1){///移動
+        x += (mouseX-oldX); y+= (mouseY-oldY); ///移動
+    }else if(now==2){///轉動
+        angle += (mouseX-oldX);///轉動
+    }else if(now==3){
+        if(mouseX-oldX > 0 ) scale *= 1.01;///縮放
+        if(mouseX-oldX < 0 ) scale *= 0.99;///縮放
+    }
+    oldX = mouseX;      oldY = mouseY;
+    display();
+}
+
+int main(int argc, char**argv)
+{
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE|GLUT_DEPTH);
+    glutCreateWindow("week06_light");
+
+    glutDisplayFunc(display);
+    ///偷來的程式碼，要放 glutCreateWindow()之後，才會有效
+    glEnable(GL_DEPTH_TEST);///開啟3D功能
+    glDepthFunc(GL_LESS);
+
+    glEnable(GL_LIGHT0);
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_LIGHTING);
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT,   mat_ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,   mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR,  mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, high_shininess);
+    ///放在 glutMainLoop()之前
+    glutKeyboardFunc(keyboard); ///上週沒完成的遺憾
+    glutMouseFunc(mouse);///滑鼠點擊放開
+    glutMotionFunc(motion);///滑鼠拖曳
+    glutMainLoop();///卡在這裡，之後的程式都不會執行
+}
+```
+## 光線的法向量 Normal
+以老師畫的圖為範例，直接由正上方照射下來會特別亮，被照到的平面面積特別集中、小。如果是從側邊一點照，照射下來的光就會散開，被照到的平面面積特別散開、大。
+因為用面來計算角度很麻煩，所以光線的照射角度用法向量來決定。夾角越接近法向量就會越亮，越不接近就越不亮。
+
+## 期中考題
+```C++
+glPushMatrix(); ///備份矩陣
+
+  glTranslatef(x,y,z); ///移動
+  glRotatef(角度,x,y,z); ///旋轉
+  glScalef(x,y,z); ///縮放
+
+glBegin(GL_POLYGON); ///開始畫
+  glColor3f(r,g,b); ///色彩
+  glNormal3f(nx,ny,nz); ///打光的法向量
+  glTexCoord2f(tx,ty); ///貼圖座標
+  glVertex3f(x,y,z); ///頂點
+glEnd();
+
+glPopMatrix();///還原矩陣
+```
