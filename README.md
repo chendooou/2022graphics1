@@ -1625,3 +1625,78 @@ glPopMatrix();///還原矩陣
 
 *obj檔裡的n是頂點，vn是法向量，vt是貼圖座標
 ```
+
+# 電腦圖學筆記week09 -20220419
+小葉老師上課要點:
+1. 考試: OpenGL必背10函式
+2. 主題: 貼圖
+3. 實作: OpenCV 讀圖、秀圖
+4. 實作: 貼圖設定
+5. 實作: 貼圖座標
+
+## 主題: 貼圖
+```
+1. 進入小葉老師的網址 https://jsyeh.org/3dcg10
+    下載兩個檔案 source.zip , data. zip , windows.zip   
+
+2. windows.zip 解壓縮 > 下載 \ windows \ Texture.exe
+    data.zip 解壓縮＞下載 \ windows \ data \ 模型
+
+3.執行 > 下載 \ window \ Texture.exe 看範例
+  *glTexCoord2f 貼圖座標
+```
+
+## 下載OpenCV 
+```
+1.到moodle下載 OpenCV-2.1.0 win32 vs2008
+
+2.安裝時要小心: (1) Add PATH 選第2個 (2)目錄不要改 C:\OpenCV2.1.0
+
+3.安裝好去 C:\ 檢查有沒有 OpenCV2.1.0資料夾
+```
+
+## 實作: OpenCV 讀圖、秀圖
+```
+0. CodeBlocks 要重開 (PATH 安裝完之後, 便會修改 PATH 的設定。)
+
+1. 寫程式很簡單、BUT設定很困難!!!
+
+2.在CodeBlocks開一個新的檔，File > New > EmptyFile, 檔名存成 week09_opencv.cpp 
+
+3.開始設定:和File同列，點選 Setting > Compiler
+
+(1)設定 Include 目錄: Search directories > Compiler > Add > (打上路徑或是點選Compiler 的 Include 目錄- c:\opencv2.1\include) > OK
+
+(2)設定 Lib 目錄: Search directories > Linker > Add > (打上路徑或是點選Compiler 的 Include 目錄- c:\opencv2.1\lib) > OK
+
+(3)設定咒語: Linker Settings > Add >打上三個咒語: cv210 , cxcore210 , highgui210 > OK
+
+4.讀圖秀圖:
+```
+
+## 實作: 貼圖設定 這是整合失敗版的(圖沒有貼到茶壺上)
+```
+*非常複雜(程式碼)、非常簡單(用剪貼的)
+*最簡單的整合: 把10行GLUT範例 + 3-5行OpenCV讀圖秀圖
+
+1.CodeBlocks開一個新的檔，File > New > Project > GLUT專案 > go , 
+  在桌面設定好freeglut , 檔名存成 week09_texture
+
+2.剪貼10行GLUT範例 + 3-5行OpenCV讀圖秀圖
+*注意:圖檔要放在工作目錄
+不同電腦的工作目錄位置可能不一樣，可以從CodeBlocks下面除錯的最後一行知道工作目錄位置
+e.g.我的電腦是(in C:\Users\USER\OneDrive\桌面\freeglut\bin)
+*第7行cvWaitKey(0); 原本要寫是因為cvShowImage秀出圖檔後馬上關掉，需要這行讓圖停住
+  但是和10行GLUT範例結合後，因為有glutMainLoop()會卡住，就不需要了
+```
+
+## 實作: 貼圖設定 成功的整合
+```
+1. 複製小葉老師提供的程式碼"myTexture.cpp"
+https://gist.github.com/jsyeh/5ed01210559721ec71b659b3ffed2dd7
+
+2.貼到原本程式碼取代原本整個的void myTexture()(紅色框部分)
+   修改第36行圖檔的名稱(黃色標記)
+   完成整合!!
+
+```
