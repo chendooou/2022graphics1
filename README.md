@@ -1534,3 +1534,94 @@ glEnd();
 
 glPopMatrix();///還原矩陣
 ```
+# 電腦圖學筆記week08 -20220411
+小葉老師上課要點:
+1. 主題: 3D模型
+2. 主題: OBJ模型檔
+    v vt vn f
+3. 實作: glm.h glm.cpp (c)
+4. 期中考題: OpenGL必背10函式
+
+## 先測試範例 打光的3D模型
+```
+1. 進入小葉老師的網址 https://jsyeh.org/3dcg10
+    下載兩個檔案 source.zip , data. zip , windows.zip   
+
+2. windows.zip 解壓縮 > 下載 \ windows \ Light Material.exe
+    data.zip 解壓縮＞下載 \ windows \ data \ 模型
+
+3.執行 > 下載 \ window \ Light Material.exe 看範例
+   左上角按右鍵可以換模型
+   GLfloat light_pos[] 可以調燈光位置
+```
+
+## 認識打光的3D模型範例程式碼
+```
+1.裝好 freeglut 資料夾到桌面，改lib\libglut32.a
+   並開啟 codeblocks 建立新的 GLUT 專案: week08_model
+
+2.開始偷程式碼!! 全選貼到notepad++，並另存新檔sample.cpp
+   去了解 GLUT 全部117行程式碼
+   *註解重點:範例誰建立的、Spinning是旋轉可以轉兩種:空殼的網格、有打光、ESC可以離開、"+"、"-"可以調
+    整增加或減少效果。
+```
+
+## 實作 GLUT 程式: 把打光的黃色茶壺變成3D模型
+```
+1.到github複製第6週的week06_light 貼到week08_model，執行程式碼:有打光的黃色小茶壺
+
+2.進入小葉老師的網址 https://jsyeh.org/3dcg10
+   下載 source.zip 解壓縮看裡面的3個程式 lightmaterial.c 、 glm.h 、glm.c
+   *glm.h 要 include 它
+   *glm.c 改檔名 glm.cpp 要加入專案
+   *lightmaterial.cpp 用Notepad++學習(偷程式碼) 偷第17行
+   貼到week08_model第2行
+   *角括號,是系統的include裡的檔案
+   *雙引號,表示同目錄裡的檔案   
+   
+3.在lightmaterial.cpp n. 搜尋 "glm" 兩次找到第166行，偷它
+   貼到week08_model第3行   
+   
+4.在lightmaterial.cpp n. 搜尋 "glm" 兩次找到第266行，並且偷第262-274行
+   貼到week08_model第4-16行，用來畫3D模型   
+```
+
+## 實作 GLUT 程式: 開始畫3D模型
+```
+*開始畫模型
+(1)用哪一行程式?
+(2)檔案在哪裡? 
+
+(1)用哪一行程式? drawmodel()
+把display()裡原本黃色打光茶壺註解掉改 drawmodel() 畫模型
+
+(2)檔案在哪裡? 要放在 working dir 工作目錄裡!!!
+    在CodeBlocks 下方 藍色 Build Log 最後一行有說我們的工作目錄位置
+    e.g.我的電腦是 (in C:\Users\USER\OneDrive\桌面\freeglut\bin)
+    
+1.將 下載\data.zip 裡面的 data資料夾複製到"工作目錄"下    
+
+2.複製 glm.h 和 glm.c 放到 week08_model 目錄，將 glm.c 改檔名成 glm.cpp
+   *注意:副檔名要看到才行  在視窗>檢視>顯示>副檔名(要打勾)
+   
+3.最後，在week08_model 的專案中，加入 glm.cpp
+   對黑黑的 week08_model 按右鍵，點 Add Files... >
+   選同目錄(week08_model資料夾)的glm.cpp > 開啟 > OK   
+   
+4.執行結果，讚啦有一顆黃色足球!!   
+
+5.改第8行的程式碼可以換模型
+
+6.改第39行把week06_light改成week08_model
+
+7.要儲存專案，glm.cpp才能夠正常推送上github雲端， File > Save project
+```
+
+## 介紹3D模型相關資料
+```
+*模型有obj檔和mtl檔
+
+*.mtl 是 material 的縮寫
+
+*obj檔裡的n是頂點，vn是法向量，vt是貼圖座標
+```
