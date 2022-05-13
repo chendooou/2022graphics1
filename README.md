@@ -2087,3 +2087,269 @@ int main(int argc, char** argv)
 }
 
 ```
+# 電腦圖學筆記week11 -20220503
+
+小葉老師上課要點:
+1. 主題: 持續實作 glm 模型相關練習
+2. 主題: 利用 Maya 切割模型
+3. 主題: 對(特定)旋轉軸轉動(下週作業&下下週考試)
+4. 組合技: T移動、R旋轉、T移動
+
+## 主題: 持續實作 glm 模型相關練習-前置作業
+```C++
+在學校以下都要再做一次
+
+0.freeglut 裝好
+
+1.到moodle下載 OpenCV-2.1.0 win32 vs2008
+
+2.安裝時要小心: (1) Add PATH 選第2個 (2)目錄不要改 C:\OpenCV2.1.0
+
+3.安裝好去 C:\ 檢查有沒有 OpenCV2.1.0資料夾
+
+4. CodeBlocks 要重開 (PATH 安裝完之後, 便會修改 PATH 的設定。)
+
+5.在CodeBlocks開一個新的檔(專案)，File > New > EmptyFile
+
+6.開始設定:和File同列，點選 Setting > Compiler
+
+(1)設定 Include 目錄: Search directories > Compiler > Add > (打上路徑或是點選Compiler 的 Include 目錄- c:\opencv2.1\include) > OK
+
+(2)設定 Lib 目錄: Search directories > Linker > Add > (打上路徑或是點選Compiler 的 Include 目錄- c:\opencv2.1\lib) > OK
+
+(3)設定咒語: Linker Settings > Add >打上三個咒語: cv210 , cxcore210 , highgui210 > OK
+
+7.開啟一個新的 glut專案: week11_gundam
+
+8.myGundam.zip 解壓縮後的 data 要放到工作目錄
+
+9.貼上第9週的opencv 程式碼 + myTexture + 剩下的讀圖秀圖程式碼
+   >茶壺上有鋼彈模型貼圖
+   
+#include <opencv/highgui.h>
+#include <GL/glut.h>
+#include <opencv/cv.h>
+GLUquadric * sphere = NULL; ///指標 ，指到二次曲面
+int myTexture(char * filename)
+
+{
+
+    IplImage * img = cvLoadImage(filename); ///OpenCV讀圖
+
+    cvCvtColor(img,img, CV_BGR2RGB); ///OpenCV轉色彩 (需要cv.h)
+
+    glEnable(GL_TEXTURE_2D); ///1. 開啟貼圖功能
+
+    GLuint id; ///準備一個 unsigned int 整數, 叫 貼圖ID
+
+    glGenTextures(1, &id); /// 產生Generate 貼圖ID
+
+    glBindTexture(GL_TEXTURE_2D, id); ///綁定bind 貼圖ID
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); /// 貼圖參數, 超過包裝的範圖T, 就重覆貼圖
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); /// 貼圖參數, 超過包裝的範圖S, 就重覆貼圖
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); /// 貼圖參數, 放大時的內插, 用最近點
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); /// 貼圖參數, 縮小時的內插, 用最近點
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img->width, img->height, 0, GL_RGB, GL_UNSIGNED_BYTE, img->imageData);
+
+    return id;
+
+}
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glutSolidTeapot(0.3);
+    glutSwapBuffers();
+}
+int main(int argc , char**argv)
+
+{
+
+    glutInit( &argc , argv);
+
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH);
+
+    glutCreateWindow("week11_Gundam");
+
+    glutDisplayFunc(display);
+
+    myTexture("data/Diffuse.jpg");///輸入圖片名稱
+
+    glutMainLoop();
+
+}   
+```
+
+## 主題: 持續實作 glm 模型相關練習-讀入模型、畫出來
+```C++
+1.進入小葉老師的網址 https://jsyeh.org/3dcg10
+  下載  source.zip , 要用到裡面的 glm.h , glm.c , transformation.c
+
+2.把 glm.c 改檔名成 glm.cpp ， 把 glm.cpp , glm.h 放到 week11_gundam 專案目錄裡
+
+3.在 week11_gundam 專案中，Add Files > 加入 glm.cpp
+
+4.加入程式碼，秀出鋼彈模型
+
+**程式碼筆記
+
+*pmodel 指標解釋
+
+GLMmodel * pmodel = NULL;
+//假設 pmodel 是女朋友(模型)，如果沒有女朋友就給空指標，表示沒女朋友
+
+ if ( pmodel==NULL ){///如果是空指標 代表模型沒問題了
+// 沒有女朋友，可是一定要有，所以要加入相親迴圈大會
+        pmodel=glmReadOBJ("data/Gundam.obj");
+        //分配一個對象給你做女朋友
+        glmUnitize(pmodel); ///使用3D模型 ,縮放到-1...+1才看的到
+        //決定女朋友身材 設定好大小
+        glmFacetNormals(pmodel);///使用3d模型，面的法向量
+        //重新設定法向量，因為要打光所以法向量很重要
+        glmVertexNormals(pmodel,90); ///使用3D模型，頂點的法向量
+        //如果頂點遇到90度直角，向上的面法向量就90度向上，向左的面法向量也90度向左
+
+5.因為是用自己的電腦，所以之前已經把鋼彈貼圖垂直翻轉過了
+   假如第一次遇到貼倒了，要到小畫家垂直翻轉過來
+
+6.秀出的模型似乎有點壓扁。原因: 因為沒開3D前後深度測試
+
+#include <GL/glut.h>
+float angle=0;
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glColor3f(1,1,1);///白色
+    glutSolidTeapot(0.3);///茶壺當身體
+    glPushMatrix();
+        glTranslatef(0.2,0,0);
+        glRotatef(angle,0,0,1);
+        glTranslatef(0.2,0,0);
+        glColor3f(1,0,0);///紅色的
+        glutSolidTeapot(0.2);///小茶壺 想像他是手臂
+    glPopMatrix();
+    glutSwapBuffers();
+    angle++; ///如果轉太快可以改成angle += 0.1
+}
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    glutCreateWindow("week12_TRT");
+
+    glutIdleFunc(display);
+    glutDisplayFunc(display);
+    glutMainLoop();
+}
+
+7.加入3D深度測試，使有立體的感覺；加入 rotatef ，讓鋼彈模型轉動起來 
+
+#include <opencv/highgui.h> ///使用 OpenCV 2.1 比較簡單, 只要用 High GUI 即可
+#include <GL/glut.h>
+#include <opencv/cv.h>
+#include "glm.h"///使用3d模型
+GLMmodel * pmodel = NULL;
+int myTexture(char * filename)
+{
+    IplImage * img = cvLoadImage(filename); ///OpenCV讀圖
+    cvCvtColor(img,img, CV_BGR2RGB); ///OpenCV轉色彩 (需要cv.h)
+    glEnable(GL_TEXTURE_2D); ///1. 開啟貼圖功能
+    GLuint id; ///準備一個 unsigned int 整數, 叫 貼圖ID
+    glGenTextures(1, &id); /// 產生Generate 貼圖ID
+    glBindTexture(GL_TEXTURE_2D, id); ///綁定bind 貼圖ID
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); /// 貼圖參數, 超過包裝的範圖T, 就重覆貼圖
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); /// 貼圖參數, 超過包裝的範圖S, 就重覆貼圖
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); /// 貼圖參數, 放大時的內插, 用最近點
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); /// 貼圖參數, 縮小時的內插, 用最近點
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img->width, img->height, 0, GL_RGB, GL_UNSIGNED_BYTE, img->imageData);
+    return id;
+}
+float angle=0;
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    if ( pmodel==NULL ){///如果是空指標 代表模型沒問題了
+        pmodel=glmReadOBJ("data/Gundam.obj");
+        glmUnitize(pmodel); ///使用3D模型 ,縮放到-1...+1才看的到
+        glmFacetNormals(pmodel);///使用3d模型，面的法向量
+        glmVertexNormals(pmodel,90); ///使用3D模型，頂點的法向量
+      }
+
+      glPushMatrix();
+        glRotatef(angle, 0,1,0);
+        glmDraw(pmodel , GLM_TEXTURE);
+      glPopMatrix();
+
+    glutSwapBuffers();
+    angle += 1;
+}
+int main(int argc , char**argv)
+{
+    glutInit( &argc , argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH);
+    glutCreateWindow("week11_Gundam");
+
+    glEnable(GL_DEPTH_TEST);///開3D深度測試,才會有3D的效果
+    glutIdleFunc(display);
+    glutDisplayFunc(display);
+    myTexture("data/Diffuse.jpg");///輸入圖片名稱
+    glutMainLoop();
+}
+```
+
+## 主題: 利用 Maya 切割模型
+```
+1.到 youtube 搜尋: 如何用 Maya 匯出 3D模型檔(obj)
+
+2.之後作業不可以抄襲，如果手腳轉動怪怪成是可以正常運作那就有問題
+```
+
+## 主題: 對(特定)旋轉軸轉動
+```C++
+1.新建一個新的 GLUT 專案 : week11_TRT
+
+2.準備好一顆白色茶壺(沒有貼圖、沒有打光)
+
+3.畫一個黃色茶壺當身體，再畫另一個綠色茶壺當手臂，但是疊在一起了
+
+4.既然綠色茶壺是手臂，要把它移到右邊而且讓他轉動
+#include <GL/glut.h>
+void hand(){
+    glColor3f(0,1,0);
+    glutSolidTeapot(0.2);
+}
+void body(){
+    glColor3f(1,1,0);
+    glutSolidTeapot(0.3);
+}
+float angle=0;
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    body();
+    glPushMatrix();
+        glTranslatef(0.5,0.2,0);
+        glRotatef(angle,0,0,1);
+        glTranslatef(0.3,0,0);
+        hand();
+    glPopMatrix();
+    glutSwapBuffers();
+    angle++; ///如果轉太快可以改成angle += 0.1
+}
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    glutCreateWindow("week11_TRT");
+
+    glutIdleFunc(display);
+    glutDisplayFunc(display);
+
+    glutMainLoop();
+}
+```
