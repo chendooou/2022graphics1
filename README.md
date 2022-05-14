@@ -2353,3 +2353,173 @@ int main(int argc, char** argv)
     glutMainLoop();
 }
 ```
+
+# 電腦圖學筆記week12 -20220510
+小葉老師上課要點:
+1. 主題:T-R-T (移動、旋轉、移動)對特定軸轉動
+2. 作業: T-R-T
+3. 下週考試: T-R-T 對特定軸轉動
+
+## 主題: T-R-T (移動、旋轉、移動)對特定軸轉動
+```
+1.進入小葉老師的網址 https://jsyeh.org/3dcg10
+   下載 windows.zip 解壓縮> \windows\Transformation.exe
+   下載 data.zip  解壓縮 > \windows\data\模型
+
+2.*觀察和學習模型
+
+3.到小葉老師做的網頁
+   https://120.125.80.50/GL/opengl_TRT_demo.html
+   這網頁不安全，因為老師們沒有付費
+   1.點右下角 " ToDraw " , 左邊小黑可以畫圖 (畫個身體和手臂)
+   2.Ctrl-R Reload 可以清空畫面
+   3.可以移動程式碼順序
+   4.可以按 angle= 在按空白鍵,會產生動畫
+
+   *黃色手臂可以旋轉起來
+   
+   
+   5.點 glTranslatef() 那一行,點它可以移動小黑裡的圖，讓黃色手臂在中間旋轉   
+   
+   6.再點另一個 glTranslatef() 把整個會旋轉的手臂移動到身體的右上方
+```
+
+## 實作: T-R-T (移動、旋轉、移動)
+```cpp
+1.開啟 Codeblocks , File > New > Project > 開啟一個新的 GLUT 專案 : week12_TRT
+
+2.放上去基礎10行程式碼 + 6行 T-R-T
+
+3.並且讓他會自動轉動 
+  ( float angle=0, 加上 glRotatef(angle,0,0,1) , 再加上 angle++ , 最後還有 glutIdleFunc( display ) 讓他轉起來)
+  
+  #include <GL/glut.h>
+float angle=0;
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glPushMatrix();
+        ///glTranslatef(0,0,0);
+        glRotatef(angle,0,0,1);
+        ///glTranslatef(0,0,0);
+        glutSolidTeapot(0.2);
+    glPopMatrix();
+    glutSwapBuffers();
+    angle++;
+}
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    glutCreateWindow("week12_TRT");
+
+    glutIdleFunc(display);
+    glutDisplayFunc(display);
+    glutMainLoop();
+}
+
+4.做出一個茶壺超人:白色茶壺當身體，再加上紅色小茶壺掛到右邊當手臂而且旋轉
+
+#include <GL/glut.h>
+float angle=0;
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glColor3f(1,1,1);///白色
+    glutSolidTeapot(0.3);///茶壺當身體
+    glPushMatrix();
+        glTranslatef(0.2,0,0);
+        glRotatef(angle,0,0,1);
+        glTranslatef(0.2,0,0);
+        glColor3f(1,0,0);///紅色的
+        glutSolidTeapot(0.2);///小茶壺 想像他是手臂
+    glPopMatrix();
+    glutSwapBuffers();
+    angle++; ///如果轉太快可以改成angle += 0.1
+}
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    glutCreateWindow("week12_TRT");
+
+    glutIdleFunc(display);
+    glutDisplayFunc(display);
+    glutMainLoop();
+}
+
+5.再開啟一個新的 GLUT 專案: week12_TRT_TRT
+   再增加一個TRT紅色小茶壺，當作下手肘，左邊也要
+#include <GL/glut.h>
+float angle=0;
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glColor3f(1,1,1);///白色
+    glutSolidTeapot(0.3);///茶壺當身體
+    glPushMatrix();
+        glTranslatef(0.2,0,0);
+        glRotatef(angle,0,0,1);
+        glTranslatef(0.2,0,0);
+        glColor3f(1,0,0);///紅色的
+        glutSolidTeapot(0.2);///小茶壺 想像他是手臂
+        glPushMatrix();
+            glTranslatef(0.2,0,0);
+            glRotatef(angle,0,0,1);
+            glTranslatef(0.2,0,0);
+            glColor3f(1,0,0);///紅色的
+            glutSolidTeapot(0.2);///小茶壺 想像他是手臂
+        glPopMatrix();
+    glPopMatrix();
+    glutSwapBuffers();
+    angle++; ///如果轉太快可以改成angle += 0.1
+}
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    glutCreateWindow("week12_TRT_TRT");
+
+    glutIdleFunc(display);
+    glutDisplayFunc(display);
+    glutMainLoop();
+}
+```
+
+## 複習: 使用 Git 指令備份程式碼到 GitHub
+```
+1.安裝 Git for Window , 開啟 Git Bash
+
+*以下有淺藍色襯底的是要輸入Git Bash的指令
+
+2.cd desktop  : cd 是改變目錄的意思(change directory)
+   黃色字會說明經過什麼目錄在哪個目錄
+   要備份的程式碼資料夾在哪個目錄就到哪個目錄去
+   在學校通常都是 desktop，我自己的電腦就要先進入 OneDrive 再進入 桌面
+
+3.start .  : 開啟現在所在目錄
+
+4.git clone https://github.com/chendooou/2022graphics1
+   : 可以把在 GitHub 上面的雲端 clone(複製) 下來
+   如果已經 clone 過了會出現錯誤訊息: already exist ，那表示 2022graphics1 這個資料夾已經在電腦裡不需要
+   再 clone 了
+
+5.cd 2022graphics1  : 進入你的(倉庫)目錄
+
+6.git pull  : 是把雲端拉下來到我的硬碟倉庫
+
+7.start .  : 開啟現在所在目錄，然後就可以把在要備份的程式碼資料夾複製到 2022graphics1
+
+8.git status  :查看倉庫狀況，這時會紅色呈現剛剛複製進去的目錄名稱
+
+9.git add .  :把紅色的目錄加進去 git 帳冊
+
+10.git status  :再次查看倉庫狀況，原本呈現紅色的目錄會變成綠色呈現
+
+11.git commit -m"week12"  :確認 git 帳冊，如果沒有做過(例如用每次開機就會重整資料的學校電腦)，他
+     會顯示說不認識你，這時按照格式輸入就好
+     (git config --global user name , git config --global user name )
+     然後記得再次 git commit -m"week12" ，week12是會註記在GitHub上的簽名(?)
+
+12.git push  : 推送上雲端，到 GitHub 更新頁面看看是否有成功上傳要備份的程式碼目錄
+```
