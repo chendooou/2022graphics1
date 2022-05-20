@@ -1675,7 +1675,7 @@ glPopMatrix();///還原矩陣
 ```
 
 ## 實作: 貼圖設定 這是整合失敗版的(圖沒有貼到茶壺上)
-```
+```cpp
 *非常複雜(程式碼)、非常簡單(用剪貼的)
 *最簡單的整合: 把10行GLUT範例 + 3-5行OpenCV讀圖秀圖
 
@@ -1688,10 +1688,38 @@ glPopMatrix();///還原矩陣
 e.g.我的電腦是(in C:\Users\USER\OneDrive\桌面\freeglut\bin)
 *第7行cvWaitKey(0); 原本要寫是因為cvShowImage秀出圖檔後馬上關掉，需要這行讓圖停住
   但是和10行GLUT範例結合後，因為有glutMainLoop()會卡住，就不需要了
+  
+#include <GL/glut.h>
+#include <opencv/highgui.h>
+void myTexture()
+{
+    IplImage * img = cvLoadImage("woo.png"); ///讀圖
+    cvShowImage("opencv",img); ///秀圖
+    ///cvWaitKey(0); 等待任意鍵繼續,可以不用寫,因為有glutMainLoop()卡住
+}
+
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glutSolidTeapot(0.3);
+    glutSwapBuffers();
+}
+
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    glutCreateWindow("week09_texture!");
+
+    glutDisplayFunc(display);
+    myTexture();
+
+    glutMainLoop();
+}  
 ```
 
 ## 實作: 貼圖設定 成功的整合
-```
+```cpp
 1. 複製小葉老師提供的程式碼"myTexture.cpp"
 https://gist.github.com/jsyeh/5ed01210559721ec71b659b3ffed2dd7
 
@@ -1699,6 +1727,45 @@ https://gist.github.com/jsyeh/5ed01210559721ec71b659b3ffed2dd7
    修改第36行圖檔的名稱(黃色標記)
    完成整合!!
 
+#include <GL/glut.h>
+#include <opencv/highgui.h>
+#include <opencv/highgui.h> ///使用 OpenCV 2.1 比較簡單, 只要用 High GUI 即可
+#include <opencv/cv.h>
+#include <GL/glut.h>
+int myTexture(char * filename)
+{
+    IplImage * img = cvLoadImage(filename); ///OpenCV讀圖
+    cvCvtColor(img,img, CV_BGR2RGB); ///OpenCV轉色彩 (需要cv.h)
+    glEnable(GL_TEXTURE_2D); ///1. 開啟貼圖功能
+    GLuint id; ///準備一個 unsigned int 整數, 叫 貼圖ID
+    glGenTextures(1, &id); /// 產生Generate 貼圖ID
+    glBindTexture(GL_TEXTURE_2D, id); ///綁定bind 貼圖ID
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); /// 貼圖參數, 超過包裝的範圖T, 就重覆貼圖
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); /// 貼圖參數, 超過包裝的範圖S, 就重覆貼圖
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); /// 貼圖參數, 放大時的內插, 用最近點
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); /// 貼圖參數, 縮小時的內插, 用最近點
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img->width, img->height, 0, GL_RGB, GL_UNSIGNED_BYTE, img->imageData);
+    return id;
+}
+
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glutSolidTeapot(0.3);
+    glutSwapBuffers();
+}
+
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    glutCreateWindow("week09_texture!");
+
+    glutDisplayFunc(display);
+    myTexture("woo.png");
+
+    glutMainLoop();
+}
 ```
 
 # 電腦圖學筆記week10 -20220426
