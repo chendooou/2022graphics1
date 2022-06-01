@@ -3141,3 +3141,394 @@ int main(int argc, char** argv)
     glutMainLoop();
 }   
 ```
+
+# 電腦圖學筆記week14 -20220524
+
+小葉老師上課要點:
+1. 寫檔、讀檔
+2. 關節、做動畫
+3. 計時器 glutTimerFunc(時間, timer, 參數t)
+4. 播放聲音
+
+## 主題: 寫檔、讀檔
+```cpp
+* fopen() 開檔  ( 開啟檔案 )
+* fprintf() 寫檔
+* fclose() 關檔 ( 關閉檔案 )
+
+1. 在桌面上建立一個 week14-1_fprintf 資料夾
+
+2. 開啟 codeblocks 建立一個新檔 ( File > New > Empty File )  : 在 week14-1_fprintf 目錄下 
+    建立 week14.cpp  
+**寫檔 File Output ( 紀錄 ) : 為了記錄動畫的動作
+
+程式碼: FILE  *  fout = fopen( "file.txt" , "w+" );
+           檔案  指標          開啟檔案  檔名     write模式
+** FILE:檔案 *:指標 fopen:開啟檔案(檔名, write模式)
+打完後先按齒輪，和檔案所在的同目錄會迸出 .exe 和 .o 兩個檔案
+再按綠色三角加齒輪 執行 : 小黑會印出 Hello World 目錄會再迸出 .txt 檔案 (第4行code)
+
+#include <stdio.h>
+int main()
+{///FILE:檔案 *:指標 fopen:開啟檔案(檔名, write模式)
+    FILE * fout = fopen("file.txt","w+");
+     printf(     "Hello World\n");
+    fprintf(fout,"Hello World\n");
+    fclose(fout);///關閉檔案
+
+}
+
+3. 開啟 codeblocks 建立一個新檔 ( File > New > Empty File )  : 在 week14-2_fprintf_fscanf 
+   目錄下建立 week14-2.cpp  
+**讀檔 File Input ( 紀錄 ) :
+複製 week14.cpp 來用
+
+///week14-2.cpp
+#include <stdio.h>
+int main()
+{
+    FILE * fout = fopen("file.txt","w+");
+    fprintf(fout,"3.1415926\n");
+    fclose(fout);///關閉檔案
+
+    float angle=0;
+    FILE * fin = fopen("file.txt","r");
+    fscanf(fin,"%f", &angle );///angle前面記得加&
+    printf("讀到了角度:%f", angle);
+    fclose(fin);
+
+}
+
+```
+
+## 主題: 關節
+```cpp
+1. 開啟 codeblocks 建新的 GLUT 專案 : week14_angle_fprintf 
+    用上週 week13_rect_many_TRT 來改
+*用 讀檔,寫檔 將動作紀錄在小黑
+
+2. 但是可讀性太差 , 改良!!
+*加上兩行跳行 ( 小黑跳行、檔案也跳行
+每印出一堆數字就跳行
+
+///week14_angle_fprintf 改自 week13_rect_many_TRT
+#include <GL/glut.h>
+#include <stdio.h>
+float angle[20] , oldx=0;
+int angleID=0;///0號關節 1號關節
+FILE * fout = NULL;
+void myWrite(){///每呼叫一次myWrite()
+    if( fout == NULL) fout = fopen("file.txt", "w+");
+
+    for(int i=0; i<20; i++){
+        printf("%.1f ", angle[i] );///小黑印出來
+        fprintf(fout, "%.1f ", angle[i] );///檔案印出來
+    }///印出20個數字
+    printf("\n");///每呼叫一次,小黑跳行
+    fprintf(fout,"\n");///每呼叫一次,檔案也跳行
+}
+void keyboard(unsigned char key , int x  , int y)
+{
+    if (key=='0') angleID=0;
+    if (key=='1') angleID=1;
+    if (key=='2') angleID=2;
+    if (key=='3') angleID=3;
+}
+void mouse(int button , int state , int x ,int y)
+{
+    oldx=x;
+}
+void motion (int x, int y)
+{
+    angle[angleID]+=(x-oldx);
+    myWrite();
+    oldx=x;
+    glutPostRedisplay();///請GLUT重畫畫面
+}
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glColor3f(1,1,1);///白色的
+    glRectf(0.3,0.5,-0.3,-0.5);///身體,四邊形
+
+    glPushMatrix();///右半部
+        glTranslatef(0.3,0.4,0); ///(3)把手臂掛回身體
+        glRotatef(angle[0],0,0,1); ///(2)旋轉 對z軸轉動
+        glTranslatef(-0.3,-0.4,0); ///(1)把手臂的旋轉中心，放中心
+        glColor3f(1,0,0);///紅色的
+        glRectf(0.3,0.5,0.7,0.3);///上手臂
+
+        glPushMatrix();
+            glTranslatef(0.7,0.4,0); ///(3)把手臂掛回身體
+            glRotatef(angle[1],0,0,1); ///(2)旋轉
+            glTranslatef(-0.7,-0.4,0); ///(1)把手臂的旋轉中心，放中心
+            glColor3f(0,1,0);///綠色的
+            glRectf(0.7,0.5,1.0,0.3);///下手肘,綠色手臂
+        glPopMatrix();
+    glPopMatrix();
+
+    glPushMatrix();///左半部
+        glTranslatef(-0.3,0.4,0); ///(3)把手臂掛回身體
+        glRotatef(angle[2],0,0,1); ///(2)旋轉 對z軸轉動
+        glTranslatef(0.3,-0.4,0); ///(1)把手臂的旋轉中心，放中心
+        glColor3f(1,0,0);///紅色的
+        glRectf(-0.3,0.5,-0.7,0.3);///上手臂
+
+        glPushMatrix();
+            glTranslatef(-0.7,0.4,0); ///(3)把手臂掛回身體
+            glRotatef(angle[3],0,0,1); ///(2)旋轉
+            glTranslatef(0.7,-0.4,0); ///(1)把手臂的旋轉中心，放中心
+            glColor3f(0,1,0);///綠色的
+            glRectf(-0.7,0.5,-1.0,0.3);///下手肘,綠色手臂
+        glPopMatrix();
+    glPopMatrix();
+
+    glutSwapBuffers();
+}
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    //glutInitWindowSize(600,600);
+    glutCreateWindow("week13 rect TRT");
+
+    glutKeyboardFunc(keyboard);
+    glutMouseFunc(mouse);
+    glutMotionFunc(motion);
+    glutDisplayFunc(display);
+
+    glutMainLoop();
+}
+
+```
+
+## 主題: 做動畫
+```cpp
+1. 開啟 codeblocks 建新的 GLUT 專案 : week14_angles_fprintf_fscanf 
+    從上一個程式( week14_angle_fprintf  ) 做修改
+    目標: 使用 void myRead() ，在 keyboard() , 按下 ' r ' 呼叫 myRead()
+
+    * myWrite() 結尾沒有 fclose 所以在 myRead()一開始先 fclose() 做收尾
+    * 當做好一連串動作，長按 r ，便會開始播出剛剛做的一連串動作
+
+///week14_angle_fprintf_fscanf 改自 week14_angle_fprintf
+#include <GL/glut.h>
+#include <stdio.h>
+float angle[20] , oldx=0;
+int angleID=0;///0號關節 1號關節
+FILE * fout = NULL, * fin = NULL;
+void myWrite(){///每呼叫一次myWrite()
+    if( fout == NULL) fout = fopen("file.txt", "w+");
+
+    for(int i=0; i<20; i++){
+        printf("%.1f ", angle[i] );///小黑印出來
+        fprintf(fout, "%.1f ", angle[i] );///檔案印出來
+    }///印出20個數字
+    printf("\n");///每呼叫一次,小黑跳行
+    fprintf(fout,"\n");///每呼叫一次,檔案也跳行
+    ///這裡沒有fclose
+}
+void myRead(){
+    if( fout != NULL ) { fclose(fout); fout=NULL; }///fclose寫在這裡收尾myWrite()開的檔案
+    if( fin == NULL ) fin = fopen("file.txt", "r");
+    for(int i=0; i<20; i++){
+        fscanf(fin, "%f",&angle[i] );
+    }
+    glutPostRedisplay();///重畫畫面
+}
+void keyboard(unsigned char key , int x  , int y)
+{
+    if (key=='r') myRead();
+    if (key=='0') angleID=0;
+    if (key=='1') angleID=1;
+    if (key=='2') angleID=2;
+    if (key=='3') angleID=3;
+}
+void mouse(int button , int state , int x ,int y)
+{
+    oldx=x;
+}
+void motion (int x, int y)
+{
+    angle[angleID]+=(x-oldx);
+    myWrite();
+    oldx=x;
+    glutPostRedisplay();///請GLUT重畫畫面
+}
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glColor3f(1,1,1);///白色的
+    glRectf(0.3,0.5,-0.3,-0.5);///身體,四邊形
+
+    glPushMatrix();///右半部
+        glTranslatef(0.3,0.4,0); ///(3)把手臂掛回身體
+        glRotatef(angle[0],0,0,1); ///(2)旋轉 對z軸轉動
+        glTranslatef(-0.3,-0.4,0); ///(1)把手臂的旋轉中心，放中心
+        glColor3f(1,0,0);///紅色的
+        glRectf(0.3,0.5,0.7,0.3);///上手臂
+
+        glPushMatrix();
+            glTranslatef(0.7,0.4,0); ///(3)把手臂掛回身體
+            glRotatef(angle[1],0,0,1); ///(2)旋轉
+            glTranslatef(-0.7,-0.4,0); ///(1)把手臂的旋轉中心，放中心
+            glColor3f(0,1,0);///綠色的
+            glRectf(0.7,0.5,1.0,0.3);///下手肘,綠色手臂
+        glPopMatrix();
+    glPopMatrix();
+
+    glPushMatrix();///左半部
+        glTranslatef(-0.3,0.4,0); ///(3)把手臂掛回身體
+        glRotatef(angle[2],0,0,1); ///(2)旋轉 對z軸轉動
+        glTranslatef(0.3,-0.4,0); ///(1)把手臂的旋轉中心，放中心
+        glColor3f(1,0,0);///紅色的
+        glRectf(-0.3,0.5,-0.7,0.3);///上手臂
+
+        glPushMatrix();
+            glTranslatef(-0.7,0.4,0); ///(3)把手臂掛回身體
+            glRotatef(angle[3],0,0,1); ///(2)旋轉
+            glTranslatef(0.7,-0.4,0); ///(1)把手臂的旋轉中心，放中心
+            glColor3f(0,1,0);///綠色的
+            glRectf(-0.7,0.5,-1.0,0.3);///下手肘,綠色手臂
+        glPopMatrix();
+    glPopMatrix();
+
+    glutSwapBuffers();
+}
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    //glutInitWindowSize(600,600);
+    glutCreateWindow("week13 rect TRT");
+
+    glutKeyboardFunc(keyboard);
+    glutMouseFunc(mouse);
+    glutMotionFunc(motion);
+    glutDisplayFunc(display);
+
+    glutMainLoop();
+}
+
+2. 奇怪的地方
+    為什麼專案產生的檔案 file.txt 放在奇怪的目錄 (in C:\Users\USER\OneDrive\桌面\freeglut\bin) ?
+
+ 原因: 是歷史遺毒(以前設定造成的原因) GLUT專案需要 freeglut.dll 所以 working_dir 
+            被設定在 freeglut\bin 裡面
+            
+     怎麼做能夠讓 file.txt 和專案放在同一個目錄?
+     2.1 將專案目錄裡的 .cbp 檔案使用 Notepad++ 開啟，
+         找到 working_dir="C:/Users/USER/OneDrive/桌面/freeglut/bin" 
+         都改成 working_dir="." (小數點) 
+         記得按 ctrl +s 存檔  
+         
+     2.2 回到 codeblocks 會詢問是否 Reload Project ， 按 Yes 
+     
+     2.3 按下綠色三角形齒輪執行看看，會出現系統錯誤找不到 freeglut.dll 
+     
+     2.4 到 freeglut/bin 目錄去複製 freeglut.dll 貼到專案資料夾( week14_angles_fprintf_fscanf )
+     
+     2.5 再回到codeblocks 按綠三角形加齒輪執行，就可以成功!! 動動機器人的關節，
+           會記錄在小黑視窗，開啟的txt檔也會出現再專案目錄資料夾。
+           ( txt 檔內同樣紀錄小黑視窗中的動作紀錄)
+```
+
+## 主題: 計時器 glutTimerFunc(時間, timer, 參數t)
+```cpp
+* 持續按 r 可以播出動畫，但是友人的速度可能有點慢，這是要看每一台電腦 keyboard 設定的速度
+   為了解決這樣的問題，可以使用計時器 glutTimerFunc
+
+1. 開啟 codeblocks 建新的 GLUT 專案 : week14_timer
+    
+    * void timer(int t) 寫 timer 函式
+    * glutTimerFunc ( 等多久 , timer , t 參數 );
+    
+///week14_timer 
+#include <GL/glut.h>
+#include <stdio.h>
+void timer(int t){
+    printf("起床,現在時間: %d\n", t);
+}
+void display()
+{
+
+}
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    glutCreateWindow("week14_timer");
+    ///前一晚一次設好多鬧鐘,每天早上時間到了就響
+    glutTimerFunc(1000,timer,1);
+    glutTimerFunc(2000,timer,2);
+    glutTimerFunc(3000,timer,3);
+    glutTimerFunc(4000,timer,4);
+    glutTimerFunc(5000,timer,5);
+    glutDisplayFunc(display);
+    glutMainLoop();
+}    
+
+2. * 但是期末作品30秒，每秒30格，需要設900個timer太麻煩了
+   > 使用 函式呼叫函式 讓程式自動能夠 timer 接著 timer 設
+
+   開啟 codeblocks 建新的 GLUT 專案 : week14_timer_one_by_one
+   * 設定5秒後 第0個timer開始起床，然後接下來函式會自己呼叫函式，每一秒建立一個t+1個timer
+
+///week14_timer_one_by_one
+#include <GL/glut.h>
+#include <stdio.h>
+void timer(int t){
+    printf("起床,現在時間: %d\n", t);
+    glutTimerFunc(1000, timer, t+1);
+}
+void display()
+{
+
+}
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    glutCreateWindow("week14_timer");
+    ///一次設好多鬧鐘,每天早上自己在那邊叫
+    glutTimerFunc(5000,timer,0);///設定:5秒後,第0個timer
+    glutDisplayFunc(display);
+    glutMainLoop();
+}
+```
+
+## 主題: 播放聲音
+```cpp
+* 播放聲音用 PlaySound ，要先下載 音檔 "do.wav"
+
+1. 使用 week14_timer_one_by_one 繼續改程式碼
+
+*要加標頭檔 #include <mmsystem.h>
+*播聲音函式: PlaySound("do.wav" , NULL , SND_ASYNC );
+                       音檔    , 空指標(沒有指定要把音樂掛哪裡) , 非同步播出
+                       
+                       
+///week14_timer_one_by_one
+#include <GL/glut.h>
+#include <stdio.h>
+#include <mmsystem.h>
+void timer(int t){
+    printf("起床,現在時間: %d\n", t);
+    PlaySound("do.wav",NULL, SND_ASYNC);
+    glutTimerFunc(2000, timer, t+1);
+}
+void display()
+{
+
+}
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    glutCreateWindow("week14_timer");
+    ///一次設好多鬧鐘,每天早上自己在那邊叫
+    glutTimerFunc(5000,timer,0);///設定:5秒後,第0個timer
+    glutDisplayFunc(display);
+    glutMainLoop();
+}                       
+```
