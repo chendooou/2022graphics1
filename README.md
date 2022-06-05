@@ -3630,10 +3630,10 @@ int main()
 ## 主題:  PlaySound() 播 mp3
 ```cpp
 *     wav                v.s                MP3 
-     檔案大                                  檔案小            
+     檔案大                                檔案小            
     原始檔案                             壓縮過檔案
-  40年前就有                           20年前出現  
-簡單:程式碼只要一行           複雜:要用較多行程式碼
+  40年前就有                             20年前出現  
+簡單:程式碼只要一行                   複雜:要用較多行程式碼
 
 PlaySound()只要一行使用 wav 即可播聲音
 
@@ -3794,7 +3794,7 @@ int main(int argc, char** argv)
 ## 主題: 機器人擺動作、跳舞
 *我們甲班在講解這個部分有錄影檔壞掉，所以有參考乙班的上課內容
 
-```
+```cpp
 1. 開啟 codeblocks 建新的 GLUT 專案 : week15_homework_gundam_parts
     從上一個程式( week15_angles_TRT_again  ) 做修改
 
