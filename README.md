@@ -3531,4 +3531,441 @@ int main(int argc, char** argv)
     glutDisplayFunc(display);
     glutMainLoop();
 }                       
+```cpp
+# 電腦圖學筆記week15 -20220531
+
+小葉老師上課要點:
+1. 播聲音、播MP3
+2. 播放動畫、內插
+3. 機器人擺動作、跳舞
+
+## 主題: PlaySound() 播聲音
+```cpp
+1. 開啟 codeblocks 建立一個新檔(File > New > Empty File) : week15-1_PlaySound.cpp
+
+2. 上週使用 #include <mmsystem.h>
+
+    本週使用 #include <windows.h> 
+    PlaySound( "檔名.wav" , NULL , SND_ASYNC);  //不等待/不同步
+    PlaySound( "檔名.wav" , NULL , SND_SYNC);  //等待/同步
+
+3. 要注意工作執行目錄 working_dir (in C:\....)
+
+4. 要成功播出聲音，要加入咒語wimnn : 
+    * 設定咒語步驟複習:
+    1. Settings > Compiler
+    2. Linker settings > Add > 輸入:winmm
+    3. 按綠色三角行加齒輪執行 :
+        *程式音檔不存在，所以出現的聲音是 window 內建的錯誤提示聲
+
+#include <windows.h>
+#include <stdio.h>
+int main()
+{
+    printf("PlaySound()之前\n");
+        ///檔案不存在,會有很小聲的錯誤聲
+    PlaySound("badbad.wav",NULL, SND_SYNC);
+    printf("PlaySound()之後\n");
+}
+    
+  4. 在 codeblocks 下方的 Build log 裡確定工作目錄位置後，將正確音檔放進這個目錄，就會正常
+        播放聲音了
+     *我放了鵝叫聲的音檔在工作目錄裡 ，音檔一定要是 .wav 檔 (PlaySound() 只能播 wav檔)
+
+#include <windows.h>
+#include <stdio.h>
+int main()
+{
+    printf("PlaySound()之前\n");
+        ///加入正確的音檔(音檔注意要放在工作目錄)
+    PlaySound("07013033.wav",NULL, SND_SYNC);
+    printf("PlaySound()之後\n");
+}
+        
+```
+## 主題: PlaySound() 更多參數
+```cpp
+1. 開啟 codeblocks 建立一個新檔(File > New > Empty File): 
+    week15-2_SND_SYNC_SND_ASYNC.cpp
+
+    *PlaySound( "檔名.wav" , NULL , SND_ASYNC);  //不等待/不同步
+      > 如果沒有迴圈控制，程式會直接執行到最後一行。
+         有迴圈控制，可以不播完，再背景播，繼續做下一個指令 ，適合做互動
+
+    *PlaySound( "檔名.wav" , NULL , SND_SYNC);  //等待/同步
+     > 會把這一行音檔播完，等到天荒地老才會執行下一行，不適合做互動
+
+2. 將 do.wav , re.wav, mi.wav 三個音檔放入目錄資料夾，用 SYNC (等待)，會完整播完 do , re , mi 音檔
+
+#include <windows.h>
+#include <stdio.h>
+int main()
+{
+    PlaySound("do.wav",NULL, SND_SYNC); ///ASYNC不等待
+    PlaySound("re.wav",NULL, SND_SYNC); ///ASYNC不等待
+    PlaySound("mi.wav",NULL, SND_SYNC); ///ASYNC不等待
+    ///最後一行就結束了
+}
+
+3. 使用 ASYNC (不等待) + 迴圈控制 : 達到互動效果
+    * 一開始播鵝叫聲，按數字1: do ；數字2: re ； 數字3: mi
+    
+#include <windows.h>
+#include <stdio.h>
+int main()
+{
+    ///不等待能夠較快執行到下一行比較適合做互動
+    PlaySound("07013033.wav",NULL, SND_ASYNC);///ASYNC不等待
+    while( 1 ){
+        printf("請輸入數字: ");
+        int N;
+        scanf("%d", &N);
+        if(N==1) PlaySound("do.wav",NULL, SND_ASYNC); ///ASYNC不等待
+        if(N==2) PlaySound("re.wav",NULL, SND_ASYNC); ///ASYNC不等待
+        if(N==3) PlaySound("mi.wav",NULL, SND_ASYNC); ///ASYNC不等待
+    }
+    ///最後一行就結束了
+}    
+```
+## 主題:  PlaySound() 播 mp3
+```cpp
+*     wav                v.s                MP3 
+     檔案大                                  檔案小            
+    原始檔案                             壓縮過檔案
+  40年前就有                           20年前出現  
+簡單:程式碼只要一行           複雜:要用較多行程式碼
+
+PlaySound()只要一行使用 wav 即可播聲音
+
+到 moodle 下載 CMP3_MCI.h 這個檔可以在 #include "CMP3_MCI.h" 後, 解鎖 mp3.Play()功能
+
+** wav 檔案不可以直接改檔名為 mp3 ，因為將兩個音檔用notepad++開啟看程式碼，
+會發現兩個檔案內容根本不一樣，所以不可以騙人不能這麼做
+
+1. 開啟 codeblocks 建立一個新檔(File > New > Empty File> : week15-3_mp3.cpp
+
+2. 在 moodle 下載 CMP_mci.h ，下載要播的 mp3 音檔，放在同目錄
+
+3.標頭檔 #include "CMP3_MCI.h"
+   宣告 CMP3_MCI mp3;
+   mp3.Load("檔名.mp3");
+   mp3.Play();
+
+#include <stdio.h>
+#include "CMP3_MCI.h" ///記得要下載、放同目錄
+CMP3_MCI mp3; ///宣告變數
+
+int main()
+{
+    mp3.Load("0505906.mp3");
+    mp3.Play();
+
+    printf("隨便等你輸入數字,程式就卡住囉: ");
+    int N; ///為了卡住程式不要直接就結束
+    scanf("%d",&N);
+}
+```
+## 主題:  關節、做動畫
+```cpp
+1. 開啟 codeblocks 建新的 GLUT 專案 : week15_angles_TRT_again 
+    從上一個程式( week14_angle_fprintf_fscanf  ) 做修改關節 ，最後長按 ' r ' 會讀入資料做出
+    原本擺過的動作
+
+2. 但是以上原本的程式很不像動畫執行的很慢 
+    原因 : 每拉一個關節 myWrite() 就寫一行 ，myRead 會讀一行
+
+    解決 : 不要把 myWrite() 放 motion() ，就不會有拉一個關節就紀錄導致動畫又慢又卡的問題
+              把一個動作對應的關節全部調好後，再紀錄 myWrite (一行)動作
+
+3. 把原 motion() 函式內的 myWrite(); 註解掉
+    在 keyboard 函式 新增 if (key=='s') myWrite(); ///調好動作,再save存檔
+
+4. 但是目前我只有8個動作，按8次 ' r ' 就結束動畫了。
+    希望能夠一樣的動作重複多做幾次怎麼做呢 ?
+
+   * 找到工作目錄開啟 " file.txt " ，會看到剛剛在小黑裡記錄的8行動作
+
+   * 把原本的8個(行)動作複製起來，貼上看要重複幾次
+     以下截圖複製貼上了8次，所以總共能夠按 72 次 ' r ' 做動作
+     
+   * 再回到 codeblock 再執行一次，就能夠按72次 ' r ' 重複動作了  
+   
+///week15_angles_TRT_angle 改自 week14_angles_fprint_fscanf
+#include <stdio.h>
+#include <GL/glut.h>
+float angle[20] , oldx=0;
+int angleID=0;///0號關節 1號關節
+FILE * fout = NULL, * fin = NULL;
+void myWrite(){///每呼叫一次myWrite()
+    if( fout == NULL) fout = fopen("file.txt", "w+");
+
+    for(int i=0; i<20; i++){
+        printf("%.1f ", angle[i] );///小黑印出來
+        fprintf(fout, "%.1f ", angle[i] ); ///檔案印出來
+    }///印出20個數字
+    printf("\n");///每呼叫一次,小黑跳行
+    fprintf(fout,"\n");///每呼叫一次,檔案也跳行
+}
+void myRead(){
+    if( fout != NULL ) { fclose(fout); fout=NULL; }
+    if( fin == NULL ) fin = fopen("file.txt", "r");
+    for(int i=0; i<20; i++){
+        fscanf(fin, "%f",&angle[i] );
+    }
+    glutPostRedisplay();///重畫畫面
+}
+void keyboard(unsigned char key , int x  , int y)
+{
+    if (key=='s') myWrite();///調好動作,再save存檔
+    if (key=='r') myRead();
+    if (key=='0') angleID=0;
+    if (key=='1') angleID=1;
+    if (key=='2') angleID=2;
+    if (key=='3') angleID=3;
+}
+void mouse(int button , int state , int x ,int y)
+{
+    oldx=x;
+}
+void motion (int x, int y)
+{
+    angle[angleID]+=(x-oldx);
+    ///myWrite();
+    oldx=x;
+    glutPostRedisplay();///請GLUT重畫畫面
+}
+void display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glColor3f(1,1,1);///白色的
+    glRectf(0.3,0.5,-0.3,-0.5);///身體,四邊形
+
+    glPushMatrix();///右半部
+        glTranslatef(0.3,0.4,0); ///(3)把手臂掛回身體
+        glRotatef(angle[0],0,0,1); ///(2)旋轉 對z軸轉動
+        glTranslatef(-0.3,-0.4,0); ///(1)把手臂的旋轉中心，放中心
+        glColor3f(1,0,0);///紅色的
+        glRectf(0.3,0.5,0.7,0.3);///上手臂
+
+        glPushMatrix();
+            glTranslatef(0.7,0.4,0); ///(3)把手臂掛回身體
+            glRotatef(angle[1],0,0,1); ///(2)旋轉
+            glTranslatef(-0.7,-0.4,0); ///(1)把手臂的旋轉中心，放中心
+            glColor3f(0,1,0);///綠色的
+            glRectf(0.7,0.5,1.0,0.3);///下手肘,綠色手臂
+        glPopMatrix();
+    glPopMatrix();
+
+    glPushMatrix();///左半部
+        glTranslatef(-0.3,0.4,0); ///(3)把手臂掛回身體
+        glRotatef(angle[2],0,0,1); ///(2)旋轉 對z軸轉動
+        glTranslatef(0.3,-0.4,0); ///(1)把手臂的旋轉中心，放中心
+        glColor3f(1,0,0);///紅色的
+        glRectf(-0.3,0.5,-0.7,0.3);///上手臂
+
+        glPushMatrix();
+            glTranslatef(-0.7,0.4,0); ///(3)把手臂掛回身體
+            glRotatef(angle[3],0,0,1); ///(2)旋轉
+            glTranslatef(0.7,-0.4,0); ///(1)把手臂的旋轉中心，放中心
+            glColor3f(0,1,0);///綠色的
+            glRectf(-0.7,0.5,-1.0,0.3);///下手肘,綠色手臂
+        glPopMatrix();
+    glPopMatrix();
+
+    glutSwapBuffers();
+}
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    //glutInitWindowSize(600,600);
+    glutCreateWindow("week15 angles TRT again");
+
+    glutKeyboardFunc(keyboard);
+    glutMouseFunc(mouse);
+    glutMotionFunc(motion);
+    glutDisplayFunc(display);
+
+    glutMainLoop();
+}
+
+
+```
+## 主題: 機器人擺動作、跳舞
+*我們甲班在講解這個部分有錄影檔壞掉，所以有參考乙班的上課內容
+
+```
+1. 開啟 codeblocks 建新的 GLUT 專案 : week15_homework_gundam_parts
+    從上一個程式( week15_angles_TRT_again  ) 做修改
+
+2. 寫一個新的 display() ，原本舊的 display()改為 displayOld() 
+   再舊的偷兩行程式碼到新的
+   
+3. 將 glm.cpp , glm.h , data(裡面有五個檔案) 放入目錄資料夾
+
+4. 回到 codeblocks 在左邊的專案，加入 Add glm.cpp
+
+    * 在專案名稱上 按右鍵，選擇 Add files > 選擇專案目錄內的 glm.cpp > OK 
+    
+5. 開始寫程式碼讀入模型
+    
+6. 檢查工作目錄是否在奇怪偏僻的桌面上 freeglut 的 bin ，總之要把工作目錄設在專案資料夾
+    *詳細圖解可參考 第14週 > 主題: 做動畫 > 2.奇怪的地方
+
+   **更改工作執行目錄步驟:
+   a. 使用 notepad++ 開啟目錄資料夾 (week15_homework_gundam_parts) 的 cbp 檔
+    b. 找到cbp 檔內所有 working_dir  (在第11、21行)
+        將原本的奇怪偏僻路徑改為一個小數點 <Option working_dir="." /> 改完記得存檔
+   c. 回到 codeblcks 會被詢問 Reload Project? 選擇 Yes 
+       被問是否存檔就給他存，在回去 notepad++看 working_dir 是否有改成功 
+       沒成功就在重複上一個 b. 工作 
+   d. 確認好之後按綠色三角加齒輪執行，出現錯誤，表示找不到 freeglut.dll
+       往下面 Build log 確認工作執行目錄是否為在專案目錄了，沒有就回去在重新修正
+   e. 到桌面上的 freeglut \ bin 裡的 freeglut 複製到專案目錄裡就好，不需重裝
+
+7. 這個新的 display() 身體沒有分區塊，不要了，改為 displayNotParts()
+    再準備一個最新的 display() ///最新的 display(),會把身體每一塊都分別處理好
+
+8. 到 teams 下載老師的 Gundam.zip , 解壓縮後有很多切割好的模型，
+    將26個切割的部位複製到專案目錄資料夾內的data資料夾 
+    
+9. 發明 myReadOne 函式用來把每個部位都讀進來，最新的 display()就可以簡短清爽的只使用
+    一行程式碼就讀入一個部位，舊的display們就是示範以前讀入一個部位就要各自寫很多行 
+    
+///week15_homework_gundam_parts 改自 week15_angles_TRT_angle
+///要把 Gundam 做出來, 需要 glm.h glm.cpp 及 gundam 5個檔案
+#include <stdio.h>
+#include <GL/glut.h>///為了 printf, fprintf , fopen , fclose ...
+#include "glm.h"
+GLMmodel * pmodel = NULL;
+GLMmodel * head = NULL;
+GLMmodel * body = NULL;
+GLMmodel * bot = NULL;
+GLMmodel * arm1 = NULL;
+GLMmodel * arm2 = NULL;
+GLMmodel * hand1 = NULL;
+GLMmodel * hand2 = NULL;
+float angle[20] , oldx=0;
+int angleID=0;///0:第0個關節, 1:第1個關節, 2:第2個關節
+FILE * fout = NULL, * fin = NULL;
+void myWrite(){///每呼叫一次myWrite()
+    if( fout == NULL) fout = fopen("file.txt", "w+");
+
+    for(int i=0; i<20; i++){
+        printf("%.1f ", angle[i] );///小黑印出來
+        fprintf(fout, "%.1f ", angle[i] ); ///檔案印出來
+    }///印出20個數字
+    printf("\n");///每呼叫一次,小黑跳行
+    fprintf(fout,"\n");///每呼叫一次,檔案也跳行
+}
+void myRead(){
+    if( fout != NULL ) { fclose(fout); fout=NULL; }
+    if( fin == NULL ) fin = fopen("file.txt", "r");
+    for(int i=0; i<20; i++){
+        fscanf(fin, "%f",&angle[i] );
+    }
+    glutPostRedisplay();///重畫畫面
+}
+void keyboard(unsigned char key , int x  , int y){
+    if (key=='s') myWrite();///調好動作,再save存檔
+    if (key=='r') myRead();
+    if (key=='0') angleID=0;
+    if (key=='1') angleID=1;
+    if (key=='2') angleID=2;
+    if (key=='3') angleID=3;
+}
+void mouse(int button , int state , int x ,int y){
+    oldx=x;
+}
+void motion (int x, int y){
+    angle[angleID]+=(x-oldx);
+    ///myWrite();
+    oldx=x;
+    glutPostRedisplay();///請GLUT重畫畫面
+}
+GLMmodel * myReadOne(char * filename){ ///發明myReadOne 用來讀每個部位進來
+    GLMmodel * one = NULL;
+    if( one == NULL ){
+        one = glmReadOBJ(filename);
+        glmUnitize(one); ///把模型設為單位大小
+        glmFacetNormals(one);
+        glmVertexNormals(one, 90);
+    }
+    return one;
+}
+void display()///最新的 display(),會把身體每一塊都分別處理好
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    if(head==NULL) head=myReadOne("data/head.obj");
+    glmDraw(head, GLM_SMOOTH);
+
+    glutSwapBuffers();
+}
+void displayNotParts()///準備新的 display()
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    if( pmodel == NULL ){
+        pmodel = glmReadOBJ("data/Gundam.obj");
+        glmUnitize(pmodel); ///把模型設為單位大小
+        glmFacetNormals(pmodel);
+        glmVertexNormals(pmodel, 90);
+    }
+    glmDraw(pmodel, GLM_SMOOTH);
+
+    glutSwapBuffers();
+}
+void displayOld()///把舊的 display()改名字
+{
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glColor3f(1,1,1);///白色的
+    glRectf(0.3,0.5,-0.3,-0.5);///身體,四邊形
+
+    glPushMatrix();///右半部
+        glTranslatef(0.3,0.4,0); ///(3)把手臂掛回身體
+        glRotatef(angle[0],0,0,1); ///(2)旋轉 對z軸轉動
+        glTranslatef(-0.3,-0.4,0); ///(1)把手臂的旋轉中心，放中心
+        glColor3f(1,0,0);///紅色的
+        glRectf(0.3,0.5,0.7,0.3);///上手臂
+
+        glPushMatrix();
+            glTranslatef(0.7,0.4,0); ///(3)把手臂掛回身體
+            glRotatef(angle[1],0,0,1); ///(2)旋轉
+            glTranslatef(-0.7,-0.4,0); ///(1)把手臂的旋轉中心，放中心
+            glColor3f(0,1,0);///綠色的
+            glRectf(0.7,0.5,1.0,0.3);///下手肘,綠色手臂
+        glPopMatrix();
+    glPopMatrix();
+
+    glPushMatrix();///左半部
+        glTranslatef(-0.3,0.4,0); ///(3)把手臂掛回身體
+        glRotatef(angle[2],0,0,1); ///(2)旋轉 對z軸轉動
+        glTranslatef(0.3,-0.4,0); ///(1)把手臂的旋轉中心，放中心
+        glColor3f(1,0,0);///紅色的
+        glRectf(-0.3,0.5,-0.7,0.3);///上手臂
+
+        glPushMatrix();
+            glTranslatef(-0.7,0.4,0); ///(3)把手臂掛回身體
+            glRotatef(angle[3],0,0,1); ///(2)旋轉
+            glTranslatef(0.7,-0.4,0); ///(1)把手臂的旋轉中心，放中心
+            glColor3f(0,1,0);///綠色的
+            glRectf(-0.7,0.5,-1.0,0.3);///下手肘,綠色手臂
+        glPopMatrix();
+    glPopMatrix();
+
+    glutSwapBuffers();
+}
+int main(int argc, char** argv)
+{
+    glutInit( &argc, argv);
+    glutInitDisplayMode( GLUT_DOUBLE | GLUT_DEPTH );
+    //glutInitWindowSize(600,600);
+    glutCreateWindow("week15 angles TRT again");
+
+    glutKeyboardFunc(keyboard);
+    glutMouseFunc(mouse);
+    glutMotionFunc(motion);
+    glutDisplayFunc(display);
+
+    glutMainLoop();
+}    
 ```
