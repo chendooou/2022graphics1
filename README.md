@@ -3668,20 +3668,20 @@ int main()
 ## 主題:  關節、做動畫
 ```cpp
 1. 開啟 codeblocks 建新的 GLUT 專案 : week15_angles_TRT_again 
-    從上一個程式( week14_angle_fprintf_fscanf  ) 做修改關節 ，最後長按 ' r ' 會讀入資料做出
-    原本擺過的動作
+   從上一個程式( week14_angle_fprintf_fscanf  ) 做修改關節 ，最後長按 ' r ' 會讀入資料做出
+   原本擺過的動作
 
 2. 但是以上原本的程式很不像動畫執行的很慢 
-    原因 : 每拉一個關節 myWrite() 就寫一行 ，myRead 會讀一行
+   原因 : 每拉一個關節 myWrite() 就寫一行 ，myRead 會讀一行
 
-    解決 : 不要把 myWrite() 放 motion() ，就不會有拉一個關節就紀錄導致動畫又慢又卡的問題
-              把一個動作對應的關節全部調好後，再紀錄 myWrite (一行)動作
+   解決 : 不要把 myWrite() 放 motion() ，就不會有拉一個關節就紀錄導致動畫又慢又卡的問題
+   把一個動作對應的關節全部調好後，再紀錄 myWrite (一行)動作
 
 3. 把原 motion() 函式內的 myWrite(); 註解掉
-    在 keyboard 函式 新增 if (key=='s') myWrite(); ///調好動作,再save存檔
+   在 keyboard 函式 新增 if (key=='s') myWrite(); ///調好動作,再save存檔
 
 4. 但是目前我只有8個動作，按8次 ' r ' 就結束動畫了。
-    希望能夠一樣的動作重複多做幾次怎麼做呢 ?
+   希望能夠一樣的動作重複多做幾次怎麼做呢 ?
 
    * 找到工作目錄開啟 " file.txt " ，會看到剛剛在小黑裡記錄的8行動作
 
@@ -3796,7 +3796,7 @@ int main(int argc, char** argv)
 
 ```cpp
 1. 開啟 codeblocks 建新的 GLUT 專案 : week15_homework_gundam_parts
-    從上一個程式( week15_angles_TRT_again  ) 做修改
+   從上一個程式( week15_angles_TRT_again  ) 做修改
 
 2. 寫一個新的 display() ，原本舊的 display()改為 displayOld() 
    再舊的偷兩行程式碼到新的
@@ -3814,23 +3814,23 @@ int main(int argc, char** argv)
 
    **更改工作執行目錄步驟:
    a. 使用 notepad++ 開啟目錄資料夾 (week15_homework_gundam_parts) 的 cbp 檔
-    b. 找到cbp 檔內所有 working_dir  (在第11、21行)
-        將原本的奇怪偏僻路徑改為一個小數點 <Option working_dir="." /> 改完記得存檔
+   b. 找到cbp 檔內所有 working_dir  (在第11、21行)
+      將原本的奇怪偏僻路徑改為一個小數點 <Option working_dir="." /> 改完記得存檔
    c. 回到 codeblcks 會被詢問 Reload Project? 選擇 Yes 
-       被問是否存檔就給他存，在回去 notepad++看 working_dir 是否有改成功 
-       沒成功就在重複上一個 b. 工作 
+      被問是否存檔就給他存，在回去 notepad++看 working_dir 是否有改成功 
+      沒成功就在重複上一個 b. 工作 
    d. 確認好之後按綠色三角加齒輪執行，出現錯誤，表示找不到 freeglut.dll
-       往下面 Build log 確認工作執行目錄是否為在專案目錄了，沒有就回去在重新修正
+      往下面 Build log 確認工作執行目錄是否為在專案目錄了，沒有就回去在重新修正
    e. 到桌面上的 freeglut \ bin 裡的 freeglut 複製到專案目錄裡就好，不需重裝
 
 7. 這個新的 display() 身體沒有分區塊，不要了，改為 displayNotParts()
-    再準備一個最新的 display() ///最新的 display(),會把身體每一塊都分別處理好
+   再準備一個最新的 display() ///最新的 display(),會把身體每一塊都分別處理好
 
 8. 到 teams 下載老師的 Gundam.zip , 解壓縮後有很多切割好的模型，
-    將26個切割的部位複製到專案目錄資料夾內的data資料夾 
+   將26個切割的部位複製到專案目錄資料夾內的data資料夾 
     
 9. 發明 myReadOne 函式用來把每個部位都讀進來，最新的 display()就可以簡短清爽的只使用
-    一行程式碼就讀入一個部位，舊的display們就是示範以前讀入一個部位就要各自寫很多行 
+   一行程式碼就讀入一個部位，舊的display們就是示範以前讀入一個部位就要各自寫很多行 
     
 ///week15_homework_gundam_parts 改自 week15_angles_TRT_angle
 ///要把 Gundam 做出來, 需要 glm.h glm.cpp 及 gundam 5個檔案
